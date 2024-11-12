@@ -15,6 +15,12 @@ interface Court {
   nextAvailable: string
 }
 
+interface BookedSlot {
+  courtId: number
+  time: string
+  date: string
+}
+
 interface BookingStore {
   courts: Court[]
   selectedCourt: number
@@ -98,7 +104,7 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
         slots.push({
           id: slotId,
           time: format(parse(`${hour}:00`, 'HH:mm', new Date()), 'h:mm a'),
-          isBooked: bookedSlots.some((bookedSlot: any) => 
+          isBooked: bookedSlots.some((bookedSlot: BookedSlot) => 
             bookedSlot.courtId === courtId && 
             bookedSlot.time === timeStr && 
             bookedSlot.date === date
