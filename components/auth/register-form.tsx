@@ -31,7 +31,6 @@ export const RegisterForm = () => {
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
-
   const form = useForm<z.infer<typeof RegisterUserSchema>>({
     resolver: zodResolver(RegisterUserSchema),
     defaultValues: {
@@ -58,7 +57,7 @@ export const RegisterForm = () => {
           setTimeout(() => {
             setError(undefined);
             setSuccess(undefined);
-          }, 5000);
+          }, success ? 3000 : 5000);
         });
     });
   };
@@ -127,12 +126,18 @@ export const RegisterForm = () => {
                   </FormItem>
                 )}
               />
-              </div>
+            </div>
             <Button disabled={isPending} type="submit" className="w-full">
               Create an account
             </Button>
           </form>
         </Form>
+        {error && (
+          <p className="text-sm font-medium text-destructive mt-2">{error}</p>
+        )}
+        {success && (
+          <p className="text-sm font-medium text-green-600 mt-2">{success}</p>
+        )}
       </DialogContent>
     </Dialog>
   );
