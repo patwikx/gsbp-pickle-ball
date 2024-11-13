@@ -9,11 +9,13 @@ import { Icons } from "@/components/ui/icons"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
 import { RegisterForm } from "@/components/auth/register-form"
+import { useRouter } from "next/navigation"
 
 export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const [isLoading, setIsLoading] = React.useState(false)
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
+  const router = useRouter();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,13 +25,16 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/dashboard'
       })
 
       if (result?.error) {
         toast.error(result.error)
       } else if (result?.ok) {
-        window.location.href = "/"
+        router.push('/dashboard')
+        router.refresh()
+        toast.success("Logged in successfully")
       }
     } catch (error) {
       console.error("Sign in error:", error)

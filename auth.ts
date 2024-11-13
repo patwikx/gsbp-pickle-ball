@@ -6,7 +6,6 @@ import { getUserById } from "@/data/user"
 import { getAccountByUserId } from "./data/account"
 import { prismadb } from "./lib/db"
 
-
 export const {
   handlers: { GET, POST },
   auth,

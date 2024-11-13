@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 import { useCurrentUser } from '@/lib/auth'
 import { toast } from 'sonner'
 import axios from 'axios'
-import { useBookingStore } from '@/app/book-schedule/components/booking-store'
+import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
 
 export const revalidate = 0
 
