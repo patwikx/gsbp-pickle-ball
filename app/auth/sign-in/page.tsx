@@ -14,7 +14,7 @@ export default function Login() {
       <div className="hidden w-1/2 bg-[#f8f9fa] lg:block">
         <div className="relative flex h-full flex-col justify-between p-8">
           <div className="relative z-10">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">RD Hardware & Fishing Supply, Inc.</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900">RD REALTY DEVELOPMENT CORPORATION</h1>
           </div>
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
