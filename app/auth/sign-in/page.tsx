@@ -1,22 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+
 import Link from 'next/link'
 import { UserAuthForm } from './components/auth-form'
-import { useRouter } from 'next/navigation'
-import { useCurrentUser } from '@/lib/auth'
-
 
 
 export default function Login() {
-  const session = useCurrentUser()
-  const router = useRouter()
 
-  useEffect(() => {
-    if (session) {
-      router.push('/')
-    }
-  }, [session, router])
 
   return (
     <div className="flex min-h-screen">
@@ -29,7 +19,7 @@ export default function Login() {
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
             style={{
-              backgroundImage: "url('/placeholder.svg?height=1080&width=1080')",
+              backgroundImage: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5",
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
     
             }}

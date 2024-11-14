@@ -229,11 +229,16 @@ export default function Component() {
                               </div>
                             ) : (
                               <div className="flex justify-center mt-2">
+                                  <div className="flex items-center justify-center gap-1 text-xs mt-2">
+                                <CheckCircle className="w-3 h-3" />
+                                <span className="truncate">Available</span>
                                 <Checkbox
                                   checked={selectedSlots.includes(slot.id)}
                                   onCheckedChange={() => toggleSelectedSlot(slot.id)}
                                   className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                                 />
+                              </div>
+ 
                               </div>
                             )}
                           </div>
@@ -403,12 +408,12 @@ export default function Component() {
             </Button>
           </DialogFooter>
           {bookingStatus === 'success' && (
-            <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-lg">
+            <Card className="absolute inset-0 flex items-center justify-center rounded-lg">
               <div className="flex flex-col items-center gap-2 text-emerald-600 p-4">
                 <CheckCircle className="w-12 h-12" />
                 <p className="font-medium">Booking Confirmed!</p>
               </div>
-            </div>
+            </Card>
           )}
           {bookingStatus === 'error' && (
             <div className="flex items-center gap-2 text-red-600 mt-2">
