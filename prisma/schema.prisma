@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Booking {
-  id        String   @id @default(cuid())
-  courtId   Int
-  userId    String
-  date      String // Changed from DateTime to String
-  time      String // Store as HH:mm format
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  courtId        Int
+  userId         String
+  date           String
+  time           String
+  user           User     @relation("UserBookings", fields: [userId], references: [id])
+  invitedPlayers User[]   @relation("InvitedPlayers")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([courtId, date, time])
 }
@@ -56,8 +57,11 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  bookings      Booking[]
+  bookings      Booking[]               @relation("UserBookings")
+  invitedTo     Booking[]               @relation("InvitedPlayers")
   twoFactor     TwoFactorConfirmation[]
+  ownedGroups   Group[]                 @relation("GroupOwner")
+  memberships   GroupMembership[]
 }
 
 model VerificationToken {
@@ -95,4 +99,41 @@ model TwoFactorConfirmation {
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+model GroupMembership {
+  id        String   @id @default(cuid())
+  userId    String
+  groupId   String
+  role      String   @default("MEMBER")
+  user      User     @relation(fields: [userId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, groupId])
+}
+
+model GroupInvitation {
+  id        String   @id @default(cuid())
+  email     String
+  groupId   String
+  group     Group    @relation("GroupInvitations", fields: [groupId], references: [id])
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@unique([email, groupId])
+}
+
+model Group {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User              @relation("GroupOwner", fields: [ownerId], references: [id])
+  members     GroupMembership[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  invitations GroupInvitation[] @relation("GroupInvitations")
 }

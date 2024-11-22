@@ -3,22 +3,31 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { format, parse } from 'date-fns'
 
+interface Player {
+  id: string
+  name: string
+  email: string
+  image: string | null
+}
+
 interface TimeSlot {
   id: string
   time: string
   isBooked: boolean
+  players: Player[]
 }
 
 interface Court {
   id: number
   name: string
-  nextAvailable: string
+  currentPlayers: Player[]
 }
 
 interface BookedSlot {
   courtId: number
   time: string
   date: string
+  player: Player
 }
 
 interface BookingStore {
@@ -32,6 +41,7 @@ interface BookingStore {
   bookingStatus: 'idle' | 'loading' | 'success' | 'error'
   isBookingDialogOpen: boolean
   isLoading: boolean
+  invitedPlayers: Player[]
   setCourts: (courts: Court[]) => void
   setSelectedCourt: (courtId: number) => void
   setSelectedDate: (date: string) => void
@@ -45,14 +55,18 @@ interface BookingStore {
   resetSelectedSlots: () => void
   fetchAndUpdateTimeSlots: (courtId: number, date: string) => Promise<void>
   updateTimeSlot: (slotId: string, isBooked: boolean) => void
+  addInvitedPlayer: (player: Player) => void
+  removeInvitedPlayer: (playerId: string) => void
+  clearInvitedPlayers: () => void
+  lookupUserByEmail: (email: string) => Promise<Player | null>
 }
 
 export const useBookingStore = create<BookingStore>((set, get) => ({
   courts: [
-    { id: 1, name: "Court 1", nextAvailable: "10:00 AM" },
-    { id: 2, name: "Court 2", nextAvailable: "11:00 AM" },
-    { id: 3, name: "Court 3", nextAvailable: "9:00 AM" },
-    { id: 4, name: "Court 4", nextAvailable: "12:00 PM" },
+    { id: 1, name: "Court 1", currentPlayers: [] },
+    { id: 2, name: "Court 2", currentPlayers: [] },
+    { id: 3, name: "Court 3", currentPlayers: [] },
+    { id: 4, name: "Court 4", currentPlayers: [] },
   ],
   selectedCourt: 1,
   selectedDate: format(new Date(), 'yyyy-MM-dd'),
@@ -63,6 +77,7 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
   bookingStatus: 'idle',
   isBookingDialogOpen: false,
   isLoading: false,
+  invitedPlayers: [],
   setCourts: (courts) => set({ courts }),
   setSelectedCourt: (courtId) => set({ selectedCourt: courtId }),
   setSelectedDate: (date: string) => set({ selectedDate: date }),
@@ -78,7 +93,6 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
   setIsBookingDialogOpen: (isOpen) => set({ isBookingDialogOpen: isOpen }),
   setIsLoading: (isLoading) => set({ isLoading }),
   resetSelectedSlots: () => set({ selectedSlots: [] }),
-
   fetchAndUpdateTimeSlots: async (courtId, date) => {
     const state = get()
     state.setIsLoading(true)
@@ -90,29 +104,37 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
         },
       })
     
-      const bookedSlots = response.data.bookedTimeSlots
+      const { bookedTimeSlots, currentPlayers } = response.data
       const slots: TimeSlot[] = []
     
       // Generate time slots from 6:00 AM to 10:00 PM
       for (let hour = 6; hour <= 23; hour++) {
-        // Ensure hour is two digits
         const paddedHour = hour.toString().padStart(2, '0')
         const timeStr = `${paddedHour}:00`
-        // Create slot ID with full date and properly formatted time
-        const slotId = `${courtId}|${date}|${timeStr}` // Using | as separator to avoid issues with date formats
+        const slotId = `${courtId}|${date}|${timeStr}`
         
+        const isBooked = bookedTimeSlots.some((bookedSlot: BookedSlot) => 
+          bookedSlot.courtId === courtId && 
+          bookedSlot.time === timeStr && 
+          bookedSlot.date === date
+        )
+
         slots.push({
           id: slotId,
           time: format(parse(`${hour}:00`, 'HH:mm', new Date()), 'h:mm a'),
-          isBooked: bookedSlots.some((bookedSlot: BookedSlot) => 
-            bookedSlot.courtId === courtId && 
-            bookedSlot.time === timeStr && 
-            bookedSlot.date === date
-          )
+          isBooked,
+          players: currentPlayers[timeStr] || []
         })
       }
     
       state.setTimeSlots(slots)
+
+      // Update the current players for the selected court
+      state.setCourts(state.courts.map(court => 
+        court.id === courtId 
+          ? { ...court, currentPlayers: currentPlayers[format(new Date(), 'HH:mm')] || [] }
+          : court
+      ))
     } catch (error) {
       console.error("Failed to fetch time slots:", error)
       toast.error("Failed to load time slots. Please try again.")
@@ -124,5 +146,22 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
     timeSlots: state.timeSlots.map(slot =>
       slot.id === slotId ? { ...slot, isBooked } : slot
     )
-  }))
+  })),
+  addInvitedPlayer: (player) => set((state) => ({
+    invitedPlayers: [...state.invitedPlayers, player]
+  })),
+  removeInvitedPlayer: (playerId) => set((state) => ({
+    invitedPlayers: state.invitedPlayers.filter(player => player.id !== playerId)
+  })),
+  clearInvitedPlayers: () => set({ invitedPlayers: [] }),
+  lookupUserByEmail: async (email: string) => {
+    try {
+      const response = await axios.get(`/api/users/lookup?email=${encodeURIComponent(email)}`)
+      return response.data
+    } catch (error) {
+      console.error("Failed to lookup user:", error)
+      toast.error("Failed to find user. Please check the email and try again.")
+      return null
+    }
+  },
 }))

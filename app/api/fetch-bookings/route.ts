@@ -18,16 +18,40 @@ export async function GET(req: NextRequest) {
         courtId: parseInt(courtId),
         date: date,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+      },
     })
 
     const bookedTimeSlots = bookings.map(booking => ({
       id: booking.id,
       courtId: booking.courtId,
       time: booking.time,
-      date: booking.date
+      date: booking.date,
+      player: {
+        id: booking.user.id,
+        name: booking.user.name || 'Anonymous',
+        avatar: booking.user.image || '',
+      },
     }))
 
-    return NextResponse.json({ bookedTimeSlots })
+    // Group players by time slot
+    const currentPlayers = bookedTimeSlots.reduce((acc, slot) => {
+      const key = `${slot.time}`
+      if (!acc[key]) {
+        acc[key] = []
+      }
+      acc[key].push(slot.player)
+      return acc
+    }, {} as Record<string, Array<{ id: string; name: string; avatar: string }>>)
+
+    return NextResponse.json({ bookedTimeSlots, currentPlayers })
   } catch (error) {
     console.error('Error fetching booked slots:', error)
     return NextResponse.json(

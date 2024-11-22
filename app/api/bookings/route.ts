@@ -12,35 +12,57 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { courtId, selectedSlots } = await req.json()
-    console.log('Received data:', { courtId, selectedSlots })
+    const { courtId, selectedSlots, invitedPlayers = [] } = await req.json()
+    console.log('Received data:', { courtId, selectedSlots, invitedPlayers })
 
     const bookings = await Promise.all(
       selectedSlots.map(async (slotId: string) => {
         console.log('Processing slot:', slotId)
-        // Using | as separator to avoid issues with date formats
-        const [courtIdStr, date, time] = slotId.split('|')
-        console.log('Parsed slot data:', { courtIdStr, date, time })
         
-        if (!date || !time) {
+        // Parse the slot format: "2-2024-11-22-10:00" into parts
+        const parts = slotId.split('-')
+        if (parts.length !== 5) {
           throw new Error(`Invalid slot ID format: ${slotId}`)
         }
+
+        // Format date as YYYY-MM-DD
+        const date = `${parts[1]}-${parts[2]}-${parts[3]}`
+        
+        // Format time as HH:mm (already in correct format from the split)
+        const time = parts[4]
+        
+        console.log('Parsed slot data:', { date, time })
 
         // Log the exact data being saved
         console.log('Saving booking with:', {
           courtId: parseInt(courtId),
           date,
           time,
-          userId: session.user.id
+          userId: session.user.id,
+          invitedPlayers
         })
 
         return prisma.booking.create({
           data: {
             courtId: parseInt(courtId),
-            date, // This should now be the complete YYYY-MM-DD
-            time, // This should now be HH:mm
+            date,
+            time,
             userId: session.user.id,
+            ...(invitedPlayers.length > 0 && {
+              invitedPlayers: {
+                connect: invitedPlayers.map((playerId: string) => ({ id: playerId }))
+              }
+            })
           },
+          include: {
+            invitedPlayers: {
+              select: {
+                id: true,
+                name: true,
+                image: true
+              }
+            }
+          }
         })
       })
     )
@@ -54,6 +76,7 @@ export async function POST(req: NextRequest) {
         courtId: booking.courtId,
         time: booking.time,
         date: booking.date,
+        invitedPlayers: booking.invitedPlayers
       }))
     })
   } catch (error) {
@@ -64,3 +87,4 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+

@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { prismadb } from '@/lib/db'
 import { Header } from '@/components/header'  // Import the Header component
 import SessionWrapper from '@/components/session-provider'
+import { ToastContainer } from '@/components/toast-provider'
 
 export default async function RootLayout({
   children,
@@ -32,6 +33,7 @@ export default async function RootLayout({
       <Header />
       <main className="flex-grow">
         {children}
+        <ToastContainer />
       </main>
     </div>
     </SessionWrapper>

@@ -154,4 +154,20 @@ import { getCurrentUser } from "@/hooks/use-current-user";
     return { success: "Confirmation email sent!" };
   };
 
+  export async function fetchRegisteredPlayers() {
+    try {
+      const players = await prismadb.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      })
+      return players
+    } catch (error) {
+      console.error("Failed to fetch registered players:", error)
+      throw new Error("Failed to load registered players. Please try again.")
+    }
+  }
+
   

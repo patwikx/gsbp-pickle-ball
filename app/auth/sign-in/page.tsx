@@ -3,8 +3,6 @@
 
 import Link from 'next/link'
 import { UserAuthForm } from './components/auth-form'
-
-
 export default function Login() {
 
 

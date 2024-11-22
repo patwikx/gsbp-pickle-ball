@@ -4,26 +4,17 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { format, parseISO } from 'date-fns'
-import { AlertCircle, Calendar, ChevronLeft, ChevronRight, Clock, LandPlot, MoreVertical, Plus, RefreshCcw, CalendarDays, History, User, CreditCard } from 'lucide-react'
+import { AlertCircle, Calendar, ChevronLeft, ChevronRight, Clock, LandPlot, MoreVertical, Plus, RefreshCcw, CalendarDays, History, User, CreditCard, Search } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface Booking {
   id: string
@@ -44,6 +35,8 @@ export default function UserBookings() {
   const [showDetails, setShowDetails] = React.useState(false)
   const [showCancelDialog, setShowCancelDialog] = React.useState(false)
   const [currentPage, setCurrentPage] = React.useState(1)
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const [filterCourt, setFilterCourt] = React.useState<number | 'all'>('all')
   const bookingsPerPage = 5
 
   React.useEffect(() => {
@@ -100,7 +93,14 @@ export default function UserBookings() {
     }
   }
 
-  const upcomingBookings = bookings
+  const filteredBookings = bookings.filter(booking => 
+    (filterCourt === 'all' || booking.courtId === filterCourt) &&
+    (booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     booking.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     booking.time.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
+  const upcomingBookings = filteredBookings
     .filter(booking => {
       const dateTime = formatDateTime(booking.date, booking.time)
       return dateTime ? dateTime > new Date() : false
@@ -112,7 +112,7 @@ export default function UserBookings() {
       return dateTimeA.getTime() - dateTimeB.getTime()
     })
 
-  const pastBookings = bookings
+  const pastBookings = filteredBookings
     .filter(booking => {
       const dateTime = formatDateTime(booking.date, booking.time)
       return dateTime ? dateTime <= new Date() : false
@@ -152,7 +152,7 @@ export default function UserBookings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Loading your bookings...</CardTitle>
@@ -168,7 +168,7 @@ export default function UserBookings() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Alert variant="destructive" className="w-full max-w-md">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -179,9 +179,9 @@ export default function UserBookings() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <main className="container mx-auto py-6 px-4 space-y-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">My Bookings</h1>
             <p className="text-muted-foreground mt-1">Manage your pickleball court reservations</p>
@@ -224,17 +224,41 @@ export default function UserBookings() {
           </Card>
         </div>
 
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle>Your Court Reservations</CardTitle>
             <CardDescription>View and manage your pickleball court bookings</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="upcoming" className="space-y-4">
-              <TabsList>
-                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                <TabsTrigger value="past">Past</TabsTrigger>
-              </TabsList>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <TabsList>
+                  <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                  <TabsTrigger value="past">Past</TabsTrigger>
+                </TabsList>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="relative flex-grow sm:flex-grow-0">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search bookings..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
+                  <Select value={filterCourt.toString()} onValueChange={(value) => setFilterCourt(value === 'all' ? 'all' : parseInt(value))}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filter by court" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Courts</SelectItem>
+                      {Array.from(new Set(bookings.map(b => b.courtId))).map((courtId) => (
+                        <SelectItem key={courtId} value={courtId.toString()}>Court {courtId}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <TabsContent value="upcoming">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -255,56 +279,58 @@ export default function UserBookings() {
                         </Button>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {currentBookings.map((booking) => (
-                          <Card key={booking.id}>
-                            <CardContent className="p-4">
-                              <div className="flex items-center justify-between">
-                                <div className="space-y-1">
-                                  <div className="flex items-center">
-                                    <LandPlot className="h-5 w-5 text-primary mr-2" />
-                                    <span className="font-medium">Court {booking.courtId}</span>
-                                    <Badge className="ml-2">Upcoming</Badge>
+                      <ScrollArea className="h-[400px] rounded-md border">
+                        <div className="space-y-4 p-4">
+                          {currentBookings.map((booking) => (
+                            <Card key={booking.id} className="overflow-hidden transition-all hover:shadow-md">
+                              <CardContent className="p-0">
+                                <div className="flex items-center justify-between p-4">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center">
+                                      <LandPlot className="h-5 w-5 text-primary mr-2" />
+                                      <span className="font-medium">Court {booking.courtId}</span>
+                                      <Badge className="ml-2">Upcoming</Badge>
+                                    </div>
+                                    <div className="flex items-center text-sm text-muted-foreground">
+                                      <Calendar className="h-4 w-4 mr-2" />
+                                      <span>{booking.date ? formatDisplayDate(booking.date) : 'No date'}</span>
+                                      <Clock className="h-4 w-4 ml-4 mr-2" />
+                                      <span>{booking.time || 'No time'}</span>
+                                    </div>
                                   </div>
-                                  <div className="flex items-center text-sm text-muted-foreground">
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    <span>{booking.date ? formatDisplayDate(booking.date) : 'No date'}</span>
-                                    <Clock className="h-4 w-4 ml-4 mr-2" />
-                                    <span>{booking.time || 'No time'}</span>
-                                  </div>
-                                </div>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => {
-                                      setSelectedBooking(booking)
-                                      setShowDetails(true)
-                                    }}>
-                                      View Details
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleReschedule(booking.id)}>
-                                      Reschedule
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      className="text-destructive"
-                                      onClick={() => {
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem onClick={() => {
                                         setSelectedBooking(booking)
-                                        setShowCancelDialog(true)
-                                      }}
-                                    >
-                                      Cancel Booking
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                                        setShowDetails(true)
+                                      }}>
+                                        View Details
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleReschedule(booking.id)}>
+                                        Reschedule
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        className="text-destructive"
+                                        onClick={() => {
+                                          setSelectedBooking(booking)
+                                          setShowCancelDialog(true)
+                                        }}
+                                      >
+                                        Cancel Booking
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
                     )}
                   </motion.div>
                 </AnimatePresence>
@@ -333,46 +359,48 @@ export default function UserBookings() {
                 )}
               </TabsContent>
               <TabsContent value="past">
-                <div className="space-y-4">
-                  {pastBookings.length === 0 ? (
-                    <div className="text-center py-12">
-                      <History className="h-12 w-12 mx-auto text-muted-foreground" />
-                      <h3 className="mt-2 text-lg font-semibold">No Past Bookings</h3>
-                      <p className="text-muted-foreground mt-1">Your booking history will appear here</p>
-                    </div>
-                  ) : (
-                    pastBookings.map((booking) => (
-                      <Card key={booking.id} className="bg-muted/50">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                              <div className="flex items-center">
-                                <LandPlot className="h-5 w-5 text-muted-foreground mr-2" />
-                                <span className="font-medium">Court {booking.courtId}</span>
-                                <Badge variant="outline" className="ml-2">Completed</Badge>
+                <ScrollArea className="h-[400px] rounded-md border">
+                  <div className="space-y-4 p-4">
+                    {pastBookings.length === 0 ? (
+                      <div className="text-center py-12">
+                        <History className="h-12 w-12 mx-auto text-muted-foreground" />
+                        <h3 className="mt-2 text-lg font-semibold">No Past Bookings</h3>
+                        <p className="text-muted-foreground mt-1">Your booking history will appear here</p>
+                      </div>
+                    ) : (
+                      pastBookings.map((booking) => (
+                        <Card key={booking.id} className="overflow-hidden transition-all hover:shadow-md">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center">
+                                  <LandPlot className="h-5 w-5 text-muted-foreground mr-2" />
+                                  <span className="font-medium">Court {booking.courtId}</span>
+                                  <Badge variant="outline" className="ml-2">Completed</Badge>
+                                </div>
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <Calendar className="h-4 w-4 mr-2" />
+                                  <span>{booking.date ? formatDisplayDate(booking.date) : 'No date'}</span>
+                                  <Clock className="h-4 w-4 ml-4 mr-2" />
+                                  <span>{booking.time || 'No time'}</span>
+                                </div>
                               </div>
-                              <div className="flex items-center text-sm text-muted-foreground">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                <span>{booking.date ? formatDisplayDate(booking.date) : 'No date'}</span>
-                                <Clock className="h-4 w-4 ml-4 mr-2" />
-                                <span>{booking.time || 'No time'}</span>
-                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleNewBooking}
+                                className="gap-2"
+                              >
+                                <RefreshCcw className="h-4 w-4" />
+                                Book Again
+                              </Button>
                             </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={handleNewBooking}
-                              className="gap-2"
-                            >
-                              <RefreshCcw className="h-4 w-4" />
-                              Book Again
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -380,143 +408,116 @@ export default function UserBookings() {
       </main>
 
       <Dialog open={showDetails} onOpenChange={setShowDetails}>
-  <DialogContent className="sm:max-w-[600px] p-6">
-    <DialogHeader className="space-y-2 text-left">
-      <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
-      <DialogDescription className="text-sm text-muted-foreground">
-        Complete information about your court reservation
-      </DialogDescription>
-    </DialogHeader>
-    {selectedBooking && (
-      <div className="mt-6 space-y-4">
-        {/* Court Info - Full Width */}
-        <div className="w-full rounded-lg bg-muted/50 p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-background p-2">
-              <LandPlot className="h-5 w-5 text-muted-foreground" />
-            </div>
-            <div>
-              <h3 className="font-medium">Court {selectedBooking.courtId}</h3>
-              <p className="text-sm text-muted-foreground">Pickleball Court</p>
-            </div>
+        <DialogContent className="sm:max-w-[600px] p-0">
+          <div className="p-6 bg-primary/5">
+            <DialogHeader className="space-y-2 text-left">
+              <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
+                <Calendar className="h-6 w-6 text-primary" />
+                Booking Details
+              </DialogTitle>
+              <DialogDescription className="text-base text-muted-foreground">
+                Complete information about your court reservation
+              </DialogDescription>
+            </DialogHeader>
           </div>
-        </div>
-
-        {/* Grid Layout for Other Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-lg bg-muted/50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-background p-2">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
+          {selectedBooking && (
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">Court</div>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                    <LandPlot className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Court {selectedBooking.courtId}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">Date & Time</div>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                    <Calendar className="h-5 w-5 text-primary" />
+                    <span>{selectedBooking.date ? formatDisplayDate(selectedBooking.date) : 'No date'}</span>
+                    <Clock className="h-5 w-5 text-primary ml-2" />
+                    <span>{selectedBooking.time || 'No time'}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">User ID</div>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                    <User className="h-5 w-5 text-primary" />
+                    <span className="font-medium truncate">{selectedBooking.userId}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">Booking ID</div>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <span className="font-medium truncate">{selectedBooking.id}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="font-medium">
-                  {selectedBooking.date ? formatDisplayDate(selectedBooking.date) : 'No date'}
-                </p>
-                <p className="text-sm text-muted-foreground">Booking Date</p>
+              <div className="flex flex-col sm:flex-row gap-3 pt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => handleReschedule(selectedBooking.id)}
+                  className="flex-1 h-11"
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Reschedule
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setShowDetails(false)
+                    setShowCancelDialog(true)
+                  }}
+                  className="flex-1 h-11"
+                >
+                  Cancel Booking
+                </Button>
               </div>
             </div>
-          </div>
-
-          <div className="rounded-lg bg-muted/50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-background p-2">
-                <Clock className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium">{selectedBooking.time || 'No time'}</p>
-                <p className="text-sm text-muted-foreground">Booking Time</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg bg-muted/50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-background p-2">
-                <User className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div className="flex-1 truncate">
-                <p className="font-medium truncate">{selectedBooking.userId}</p>
-                <p className="text-sm text-muted-foreground">User ID</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg bg-muted/50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full bg-background p-2">
-                <CreditCard className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div className="flex-1 truncate">
-                <p className="font-medium truncate">{selectedBooking.id}</p>
-                <p className="text-sm text-muted-foreground">Booking ID</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Button
-            variant="outline"
-            onClick={() => handleReschedule(selectedBooking.id)}
-            className="flex-1 h-11"
-          >
-            <Calendar className="mr-2 h-4 w-4" />
-            Reschedule
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              setShowDetails(false)
-              setShowCancelDialog(true)
-            }}
-            className="flex-1 h-11"
-          >
-            Cancel Booking
-          </Button>
-        </div>
-      </div>
-    )}
-  </DialogContent>
-</Dialog>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Cancel Booking</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+              <AlertCircle className="h-6 w-6 text-destructive" />
+              Cancel Booking
+            </DialogTitle>
+            <DialogDescription className="text-base">
               Are you sure you want to cancel this court reservation? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           {selectedBooking && (
-            <div className="space-y-4">
+            <div className="space-y-4 py-4">
               <Card>
-                <CardContent className="p-4">
-                  <div className="space-y-2">
+                <CardContent className="p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <LandPlot className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Court {selectedBooking.courtId}</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
-                      <LandPlot className="h-5 w-5 text-primary" />
-                      <span className="font-medium">Court {selectedBooking.courtId}</span>
+                      <Calendar className="h-4 w-4" />
+                      <span>{selectedBooking.date ? formatDisplayDate(selectedBooking.date) : 'No date'}</span>
                     </div>
-                    <div className="flex items-center gap-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>{selectedBooking.date ? formatDisplayDate(selectedBooking.date) : 'No date'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        <span>{selectedBooking.time || 'No time'}</span>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>{selectedBooking.time || 'No time'}</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
+              <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="flex-1">
                   Keep Booking
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={() => handleCancelBooking(selectedBooking.id)}
+                  className="flex-1"
                 >
                   Cancel Booking
                 </Button>
@@ -528,3 +529,4 @@ export default function UserBookings() {
     </div>
   )
 }
+
