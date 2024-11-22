@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import axios from 'axios'
 import { toast } from 'sonner'
-import { format, parse } from 'date-fns'
+import { format, parse, isBefore, startOfDay, setHours, setMinutes } from 'date-fns'
 
 interface Player {
   id: string
@@ -59,6 +59,8 @@ interface BookingStore {
   removeInvitedPlayer: (playerId: string) => void
   clearInvitedPlayers: () => void
   lookupUserByEmail: (email: string) => Promise<Player | null>
+  isPastDate: (date: string) => boolean
+  isPastTimeSlot: (slotId: string) => boolean
 }
 
 export const useBookingStore = create<BookingStore>((set, get) => ({
@@ -122,7 +124,7 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
         slots.push({
           id: slotId,
           time: format(parse(`${hour}:00`, 'HH:mm', new Date()), 'h:mm a'),
-          isBooked,
+          isBooked: isBooked || state.isPastTimeSlot(slotId),
           players: currentPlayers[timeStr] || []
         })
       }
@@ -164,4 +166,16 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
       return null
     }
   },
+  isPastDate: (date: string) => {
+    const today = startOfDay(new Date())
+    const checkDate = startOfDay(parse(date, 'yyyy-MM-dd', new Date()))
+    return isBefore(checkDate, today)
+  },
+  isPastTimeSlot: (slotId: string) => {
+    const [, date, time] = slotId.split('|')
+    const [hours, minutes] = time.split(':').map(Number)
+    const slotDate = setMinutes(setHours(parse(date, 'yyyy-MM-dd', new Date()), hours), minutes)
+    return isBefore(slotDate, new Date())
+  },
 }))
+

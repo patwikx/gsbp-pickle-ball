@@ -18,7 +18,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
 import { BookingDialog } from './pickle-dialog'
 
-
 export const revalidate = 0
 
 export default function PickleBallBooking() {
@@ -45,6 +44,8 @@ export default function PickleBallBooking() {
     fetchAndUpdateTimeSlots,
     updateTimeSlot,
     clearInvitedPlayers,
+    isPastDate,
+    isPastTimeSlot,
   } = useBookingStore()
 
   const user = useCurrentUser()
@@ -234,6 +235,7 @@ export default function PickleBallBooking() {
                     selected={parse(selectedDate, 'yyyy-MM-dd', new Date())}
                     onSelect={(date) => date && setSelectedDate(format(date, 'yyyy-MM-dd'))}
                     initialFocus
+                    disabled={(date) => isPastDate(format(date, 'yyyy-MM-dd'))}
                   />
                 </PopoverContent>
               </Popover>
@@ -259,50 +261,56 @@ export default function PickleBallBooking() {
               ) : (
                 <ScrollArea className="h-[460px] border rounded-md p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-4">
-                    {timeSlots.map((slot) => (
-                      <TooltipProvider key={slot.id}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div
-                              className={cn(
-                                "p-3 rounded-xl transition-all duration-200",
-                                slot.isBooked 
-                                  ? 'bg-red-50 text-red-900 border border-red-200' 
-                                  : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 cursor-pointer'
-                              )}
-                              onClick={() => !slot.isBooked && toggleSelectedSlot(slot.id)}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <Clock className="w-4 h-4" />
-                                  <span className="font-medium">{slot.time}</span>
-                                </div>
-                                {!slot.isBooked && (
-                                  <Checkbox
-                                    checked={selectedSlots.includes(slot.id)}
-                                    onCheckedChange={() => toggleSelectedSlot(slot.id)}
-                                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-                                  />
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1 text-xs mt-2">
-                                {slot.isBooked ? (
-                                  <>
-                                    <Users className="w-3 h-3" />
-                                    <span className="truncate">Reserved</span>
-                                  </>
-                                ) : (
-                                  <span className="text-emerald-600">Available</span>
-                                )}
-                              </div>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {slot.isBooked ? 'This slot is already booked' : 'Click to select this time slot'}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ))}
+                  {timeSlots.map((slot) => (
+  <TooltipProvider key={slot.id}>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className={cn(
+            "p-3 rounded-xl transition-all duration-200",
+            slot.isBooked && !isPastTimeSlot(slot.id)
+              ? 'bg-red-50 text-red-900 border border-red-200 cursor-not-allowed'  // Reserved slots
+              : isPastTimeSlot(slot.id)
+              ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-60' // Past slots
+              : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 cursor-pointer' // Available slots
+          )}
+          onClick={() => !slot.isBooked && !isPastTimeSlot(slot.id) && toggleSelectedSlot(slot.id)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              <span className="font-medium">{slot.time}</span>
+            </div>
+            {!slot.isBooked && !isPastTimeSlot(slot.id) && (
+              <Checkbox
+                checked={selectedSlots.includes(slot.id)}
+                onCheckedChange={() => toggleSelectedSlot(slot.id)}
+                className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+              />
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-xs mt-2">
+            {slot.isBooked && !isPastTimeSlot(slot.id) ? (
+              <>
+                <Users className="w-3 h-3" />
+                <span className="truncate">Reserved</span>
+              </>
+            ) : !isPastTimeSlot(slot.id) ? (
+              <span className="text-emerald-600">Available</span>
+            ) : null}
+          </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        {slot.isBooked && !isPastTimeSlot(slot.id) 
+          ? 'This slot is already booked' 
+          : isPastTimeSlot(slot.id) 
+          ? 'This time slot has passed' 
+          : 'Click to select this time slot'}
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+))}
                   </div>
                 </ScrollArea>
               )}
@@ -336,3 +344,4 @@ export default function PickleBallBooking() {
     </div>
   )
 }
+
