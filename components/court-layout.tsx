@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { format, parse } from 'date-fns'
+import { debounce } from 'lodash'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -18,9 +19,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
 import { BookingDialog } from './pickle-dialog'
 
+
 export const revalidate = 0
 
-export default function PickleBallBooking() {
+export default function CourtLayout() {
   const {
     courts,
     selectedCourt,
@@ -46,6 +48,7 @@ export default function PickleBallBooking() {
     clearInvitedPlayers,
     isPastDate,
     isPastTimeSlot,
+    getCurrentPlayers,
   } = useBookingStore()
 
   const user = useCurrentUser()
@@ -57,13 +60,20 @@ export default function PickleBallBooking() {
     }
   }, [user, setName, setEmail])
 
+  const debouncedFetch = React.useMemo(
+    () => debounce((date: string) => {
+      fetchAndUpdateTimeSlots(date)
+    }, 300),
+    [fetchAndUpdateTimeSlots]
+  )
+
   React.useEffect(() => {
-    const fetchData = async () => {
-      await fetchAndUpdateTimeSlots(selectedCourt, selectedDate)
-    }
+    debouncedFetch(selectedDate)
     
-    fetchData()
-  }, [selectedCourt, selectedDate, fetchAndUpdateTimeSlots])
+    return () => {
+      debouncedFetch.cancel()
+    }
+  }, [selectedDate, debouncedFetch])
 
   const handleBooking = async () => {
     if (selectedSlots.length === 0) {
@@ -104,7 +114,7 @@ export default function PickleBallBooking() {
       clearInvitedPlayers()
       toast.success("Booking confirmed successfully!")
     
-      await fetchAndUpdateTimeSlots(selectedCourt, selectedDate)
+      debouncedFetch(selectedDate)
     } catch (error) {
       console.error('Booking failed:', error)
       setBookingStatus('error')
@@ -116,6 +126,8 @@ export default function PickleBallBooking() {
       }, 2000)
     }
   }
+
+  const currentPlayers = getCurrentPlayers()
 
   return (
     <div className="container mx-auto p-2 space-y-6">
@@ -142,70 +154,70 @@ export default function PickleBallBooking() {
           </CardHeader>
           <CardContent>
             <div className="grid sm:grid-cols-2 gap-4">
-              {courts.map((court) => (
-                <Card
-                  key={court.id}
-                  className={cn(
-                    "overflow-hidden transition-all duration-200 hover:shadow-lg group",
-                    selectedCourt === court.id && "ring-2 ring-primary"
-                  )}
-                >
-                  <div 
-                    className="aspect-[2/1] p-2 cursor-pointer relative overflow-hidden"
-                    onClick={() => setSelectedCourt(court.id)}
+              {courts.map((court) => {
+                const courtPlayers = currentPlayers[court.id] || []
+                return (
+                  <Card
+                    key={court.id}
+                    className={cn(
+                      "overflow-hidden transition-all duration-200 hover:shadow-lg group",
+                      selectedCourt === court.id && "ring-2 ring-primary"
+                    )}
                   >
-                    <div className="absolute inset-0 bg-emerald-600 transition-transform group-hover:scale-105">
-                      <div className="absolute inset-2 border-2 border-white/80 rounded opacity-80" />
-                      <div className="absolute top-2 bottom-2 left-1/2 w-0.5 -translate-x-1/2 bg-white/80" />
-                      <div className="absolute top-1/2 left-2 right-2 h-0.5 -translate-y-1/2 bg-white/80" />
-                      <div className="absolute top-[20%] left-2 right-2 h-0.5 bg-white/80" />
-                      <div className="absolute bottom-[20%] left-2 right-2 h-0.5 bg-white/80" />
+                    <div 
+                      className="aspect-[2/1] p-2 cursor-pointer relative overflow-hidden"
+                      onClick={() => setSelectedCourt(court.id)}
+                    >
+                      <div className="absolute inset-0 bg-emerald-600 transition-transform group-hover:scale-105">
+                        <div className="absolute inset-2 border-2 border-white/80 rounded opacity-80" />
+                        <div className="absolute top-2 bottom-2 left-1/2 w-0.5 -translate-x-1/2 bg-white/80" />
+                        <div className="absolute top-1/2 left-2 right-2 h-0.5 -translate-y-1/2 bg-white/80" />
+                        <div className="absolute top-[20%] left-2 right-2 h-0.5 bg-white/80" />
+                        <div className="absolute bottom-[20%] left-2 right-2 h-0.5 bg-white/80" />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white text-xl font-bold px-6 py-2 rounded-full backdrop-blur-sm bg-black/20 shadow-lg">
+                          {court.name}
+                        </span>
+                      </div>
                     </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-white text-xl font-bold px-6 py-2 rounded-full backdrop-blur-sm bg-black/20 shadow-lg">
-                        {court.name}
-                      </span>
-                    </div>
-                  </div>
 
-                  <CardContent className="p-4">
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex items-center justify-between">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Current Players</span>
+                          </div>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Current Players</span>
+                          {courtPlayers.length > 0 ? (
+                            <>
+                              {courtPlayers.map((player, index) => (
+                                <TooltipProvider key={index}>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Avatar className="w-8 h-8 border-2 border-white">
+                                        <AvatarImage src={player.image || undefined} alt={player.name} />
+                                        <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
+                                      </Avatar>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>{player.name}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ))}
+                            </>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">No players currently</span>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {court.currentPlayers && court.currentPlayers.length > 0 ? (
-                          <>
-                            {court.currentPlayers.slice(0, 4).map((player, index) => (
-                              <TooltipProvider key={index}>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Avatar className="w-8 h-8 border-2 border-white">
-                                      <AvatarImage src={player.image || undefined} alt={player.name} />
-                                      <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{player.name}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            ))}
-                            {court.currentPlayers.length > 4 && (
-                              <span className="text-sm text-muted-foreground">+{court.currentPlayers.length - 4} more</span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No players currently</span>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
           </CardContent>
         </Card>
@@ -261,56 +273,56 @@ export default function PickleBallBooking() {
               ) : (
                 <ScrollArea className="h-[460px] border rounded-md p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-4">
-                  {timeSlots.map((slot) => (
-  <TooltipProvider key={slot.id}>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div
-          className={cn(
-            "p-3 rounded-xl transition-all duration-200",
-            slot.isBooked && !isPastTimeSlot(slot.id)
-              ? 'bg-red-50 text-red-900 border border-red-200 cursor-not-allowed'  // Reserved slots
-              : isPastTimeSlot(slot.id)
-              ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-60' // Past slots
-              : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 cursor-pointer' // Available slots
-          )}
-          onClick={() => !slot.isBooked && !isPastTimeSlot(slot.id) && toggleSelectedSlot(slot.id)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span className="font-medium">{slot.time}</span>
-            </div>
-            {!slot.isBooked && !isPastTimeSlot(slot.id) && (
-              <Checkbox
-                checked={selectedSlots.includes(slot.id)}
-                onCheckedChange={() => toggleSelectedSlot(slot.id)}
-                className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
-              />
-            )}
-          </div>
-          <div className="flex items-center gap-1 text-xs mt-2">
-            {slot.isBooked && !isPastTimeSlot(slot.id) ? (
-              <>
-                <Users className="w-3 h-3" />
-                <span className="truncate">Reserved</span>
-              </>
-            ) : !isPastTimeSlot(slot.id) ? (
-              <span className="text-emerald-600">Available</span>
-            ) : null}
-          </div>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        {slot.isBooked && !isPastTimeSlot(slot.id) 
-          ? 'This slot is already booked' 
-          : isPastTimeSlot(slot.id) 
-          ? 'This time slot has passed' 
-          : 'Click to select this time slot'}
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-))}
+                  {timeSlots[selectedCourt]?.map((slot) => (
+                    <TooltipProvider key={slot.id}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={cn(
+                              "p-3 rounded-xl transition-all duration-200",
+                              slot.isBooked && !isPastTimeSlot(slot.id)
+                                ? 'bg-red-50 text-red-900 border border-red-200 cursor-not-allowed'  // Reserved slots
+                                : isPastTimeSlot(slot.id)
+                                ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-60' // Past slots
+                                : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 cursor-pointer' // Available slots
+                            )}
+                            onClick={() => !slot.isBooked && !isPastTimeSlot(slot.id) && toggleSelectedSlot(slot.id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                <span className="font-medium">{slot.time}</span>
+                              </div>
+                              {!slot.isBooked && !isPastTimeSlot(slot.id) && (
+                                <Checkbox
+                                  checked={selectedSlots.includes(slot.id)}
+                                  onCheckedChange={() => toggleSelectedSlot(slot.id)}
+                                  className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                                />
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1 text-xs mt-2">
+                              {slot.isBooked && !isPastTimeSlot(slot.id) ? (
+                                <>
+                                  <Users className="w-3 h-3" />
+                                  <span className="truncate">Reserved</span>
+                                </>
+                              ) : !isPastTimeSlot(slot.id) ? (
+                                <span className="text-emerald-600">Available</span>
+                              ) : null}
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {slot.isBooked && !isPastTimeSlot(slot.id) 
+                            ? 'This slot is already booked' 
+                            : isPastTimeSlot(slot.id) 
+                            ? 'This time slot has passed' 
+                            : 'Click to select this time slot'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ))}
                   </div>
                 </ScrollArea>
               )}
@@ -336,7 +348,7 @@ export default function PickleBallBooking() {
         email={email}
         selectedSlots={selectedSlots}
         selectedDate={selectedDate}
-        timeSlots={timeSlots}
+        timeSlots={timeSlots[selectedCourt] || []}
         bookingStatus={bookingStatus}
         onConfirmBooking={handleBooking}
         courtNumber={selectedCourt}

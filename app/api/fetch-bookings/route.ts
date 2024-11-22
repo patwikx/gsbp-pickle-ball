@@ -26,6 +26,13 @@ export async function GET(req: NextRequest) {
             image: true,
           },
         },
+        invitedPlayers: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
       },
     })
 
@@ -37,8 +44,13 @@ export async function GET(req: NextRequest) {
       player: {
         id: booking.user.id,
         name: booking.user.name || 'Anonymous',
-        avatar: booking.user.image || '',
+        image: booking.user.image || '',
       },
+      invitedPlayers: booking.invitedPlayers.map(player => ({
+        id: player.id,
+        name: player.name || 'Anonymous',
+        image: player.image || '',
+      })),
     }))
 
     // Group players by time slot
@@ -47,9 +59,9 @@ export async function GET(req: NextRequest) {
       if (!acc[key]) {
         acc[key] = []
       }
-      acc[key].push(slot.player)
+      acc[key].push(slot.player, ...slot.invitedPlayers)
       return acc
-    }, {} as Record<string, Array<{ id: string; name: string; avatar: string }>>)
+    }, {} as Record<string, Array<{ id: string; name: string; image: string }>>)
 
     return NextResponse.json({ bookedTimeSlots, currentPlayers })
   } catch (error) {

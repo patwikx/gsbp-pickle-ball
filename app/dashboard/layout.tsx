@@ -4,6 +4,7 @@ import { prismadb } from '@/lib/db'
 import { Header } from '@/components/header'  // Import the Header component
 import SessionWrapper from '@/components/session-provider'
 import { ToastContainer } from '@/components/toast-provider'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 export default async function RootLayout({
   children,
@@ -32,7 +33,10 @@ export default async function RootLayout({
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
+        <TooltipProvider>
         {children}
+
+        </TooltipProvider>
         <ToastContainer />
       </main>
     </div>
