@@ -11,10 +11,9 @@ import { CalendarDays, Clock, CheckCircle, XCircle, Loader2, Users, X, ChevronRi
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-
-import { toast } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
+import { toast } from './ui/use-toast'
 
 interface BookingDialogProps {
   isOpen: boolean
@@ -54,10 +53,23 @@ export function BookingDialog({
       if (user) {
         addInvitedPlayer(user)
         setInviteEmail("")
-        toast.success(`${user.name} has been invited`)
+        toast({
+          title: "Success",
+          description: `${user.name} has been invited`,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "User not found. Please check the email and try again.",
+          variant: "destructive",
+        })
       }
     } else if (invitedPlayers.length >= 3) {
-      toast.error("Maximum of 4 players per court (including you)")
+      toast({
+        title: "Error",
+        description: "Maximum of 4 players per court (including you)",
+        variant: "destructive",
+      })
     }
   }
 

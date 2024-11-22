@@ -123,7 +123,7 @@ export default function CourtLayout() {
       setTimeout(() => {
         setIsBookingDialogOpen(false)
         setBookingStatus('idle')
-      }, 2000)
+      }, 3000)
     }
   }
 
