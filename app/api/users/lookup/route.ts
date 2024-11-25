@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prismadb } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const email = searchParams.get('email')
+    const email = request.nextUrl.searchParams.get('email')
 
     if (!email) {
       return new NextResponse("Email is required", { status: 400 })
@@ -32,3 +32,4 @@ export async function GET(request: Request) {
     return new NextResponse("Internal Error", { status: 500 })
   }
 }
+
