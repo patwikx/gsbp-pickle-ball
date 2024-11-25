@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
-import { RegisterForm } from "@/components/auth/register-form"
 import { useRouter } from "next/navigation"
 
 export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>) {
@@ -83,7 +82,6 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
             )}
             Login
           </Button>
-          <RegisterForm />
         </div>
       </form>
       <div className="relative">

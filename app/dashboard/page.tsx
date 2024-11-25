@@ -15,6 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { EnhancedPickleballRulesModal } from '@/components/house-rules-guidelines'
 
 interface Booking {
   id: string
@@ -37,6 +38,7 @@ export default function UserBookings() {
   const [currentPage, setCurrentPage] = React.useState(1)
   const [searchTerm, setSearchTerm] = React.useState('')
   const [filterCourt, setFilterCourt] = React.useState<number | 'all'>('all')
+  const [showRulesModal, setShowRulesModal] = React.useState(true)
   const bookingsPerPage = 5
 
   React.useEffect(() => {
@@ -526,6 +528,11 @@ export default function UserBookings() {
           )}
         </DialogContent>
       </Dialog>
+
+      <EnhancedPickleballRulesModal
+        isOpen={showRulesModal}
+        onClose={() => setShowRulesModal(false)}
+      />
     </div>
   )
 }

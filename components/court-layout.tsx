@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
 import { BookingDialog } from './pickle-dialog'
-
+import { Badge } from './ui/badge'
 
 export const revalidate = 0
 
@@ -87,7 +87,6 @@ export default function CourtLayout() {
         return `${courtId}-${date}-${time}`
       })
 
-      // TODO: Replace this with a server action
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -128,6 +127,19 @@ export default function CourtLayout() {
   }
 
   const currentPlayers = getCurrentPlayers()
+  const currentBookings = React.useMemo(() => {
+    const now = new Date()
+    const currentHour = now.getHours()
+    return courts.reduce((acc, court) => {
+      const bookedSlot = timeSlots[court.id]?.find(slot => {
+        const [, , slotTime] = slot.id.split('|')
+        const slotHour = parseInt(slotTime.split(':')[0])
+        return slotHour === currentHour && slot.isBooked
+      })
+      acc[court.id] = bookedSlot ? format(parse(bookedSlot.time, 'h:mm a', new Date()), 'h:mm a') : null
+      return acc
+    }, {} as { [courtId: number]: string | null })
+  }, [courts, timeSlots])
 
   return (
     <div className="container mx-auto p-2 space-y-6">
@@ -156,6 +168,7 @@ export default function CourtLayout() {
             <div className="grid sm:grid-cols-2 gap-4">
               {courts.map((court) => {
                 const courtPlayers = currentPlayers[court.id] || []
+                const currentBooking = currentBookings[court.id]
                 return (
                   <Card
                     key={court.id}
@@ -184,33 +197,44 @@ export default function CourtLayout() {
 
                     <CardContent className="p-4">
                       <div className="flex flex-col space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Current Players</span>
+                        <div className="grid grid-cols-2 items-start gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Current Players</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {courtPlayers.length > 0 ? (
+                                <>
+                                  {courtPlayers.map((player, index) => (
+                                    <TooltipProvider key={index}>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Avatar className="w-8 h-8 border-2 border-white">
+                                            <AvatarImage src={player.image || undefined} alt={player.name} />
+                                            <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
+                                          </Avatar>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>{player.name}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  ))}
+                                </>
+                              ) : (
+                                <span className="text-sm text-muted-foreground">No players currently</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {courtPlayers.length > 0 ? (
-                            <>
-                              {courtPlayers.map((player, index) => (
-                                <TooltipProvider key={index}>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Avatar className="w-8 h-8 border-2 border-white">
-                                        <AvatarImage src={player.image || undefined} alt={player.name} />
-                                        <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
-                                      </Avatar>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>{player.name}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              ))}
-                            </>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">No players currently</span>
+                          {currentBooking && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">Current Booking</span>
+                              </div>
+                              <Badge className='mt-1 ml-5'>{currentBooking}</Badge>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -281,10 +305,10 @@ export default function CourtLayout() {
                             className={cn(
                               "p-3 rounded-xl transition-all duration-200",
                               slot.isBooked && !isPastTimeSlot(slot.id)
-                                ? 'bg-red-50 text-red-900 border border-red-200 cursor-not-allowed'  // Reserved slots
+                                ? 'bg-red-50 text-red-900 border border-red-200 cursor-not-allowed'
                                 : isPastTimeSlot(slot.id)
-                                ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-60' // Past slots
-                                : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 cursor-pointer' // Available slots
+                                ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-60'
+                                : 'bg-emerald-50 text-emerald-900 border border-emerald-200 hover:bg-emerald-100 cursor-pointer'
                             )}
                             onClick={() => !slot.isBooked && !isPastTimeSlot(slot.id) && toggleSelectedSlot(slot.id)}
                           >
@@ -313,6 +337,7 @@ export default function CourtLayout() {
                             </div>
                           </div>
                         </TooltipTrigger>
+                        
                         <TooltipContent>
                           {slot.isBooked && !isPastTimeSlot(slot.id) 
                             ? 'This slot is already booked' 
