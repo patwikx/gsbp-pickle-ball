@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import { getPasswordResetTokenByToken } from "@/data/password-reset-token";
 import { prismadb } from "@/lib/db";
 import { getCurrentUser } from "@/hooks/use-current-user";
+import { revalidatePath } from "next/cache";
 
 
 
@@ -134,7 +135,7 @@ import { getCurrentUser } from "@/hooks/use-current-user";
       return { error: "Invalid fields!" };
     }
   
-    const { email, password, name } = validatedFields.data;
+    const { email, password, name, roles, contactNo, address } = validatedFields.data;
     const hashedPassword = await bcrypt.hash(password, 10);
   
     const existingUser = await getUserByEmail(email);
@@ -143,15 +144,22 @@ import { getCurrentUser } from "@/hooks/use-current-user";
       return { error: "Email already in use!" };
     }
   
+    const now = new Date();
+    const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+  
     await prismadb.user.create({
       data: {
         email,
         name,
         password: hashedPassword,
+        renewalDate: oneYearFromNow,
+        contactNo,
+        address,
+        roles,
       },
     });
-
-    return { success: "Confirmation email sent!" };
+    revalidatePath('/dashboard/user-management')
+    return { success: "User registered successfully!" };
   };
 
   export async function fetchRegisteredPlayers() {

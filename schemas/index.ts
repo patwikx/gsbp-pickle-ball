@@ -60,7 +60,10 @@ export const RegisterUserSchema = z.object({
   }),
   name: z.string().min(1, {
     message: "First Name is required",
-  })
+  }),
+  contactNo: z.string().optional(),
+  address: z.string().optional(),
+  roles: z.string().optional(),
 });
 
 export const RegisterTenantSchema = z.object({

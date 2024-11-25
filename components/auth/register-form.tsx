@@ -25,6 +25,13 @@ import {
   DialogDescription,
   DialogContent,
 } from "../ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -37,6 +44,9 @@ export const RegisterForm = () => {
       email: "",
       password: "",
       name: "",
+      contactNo: "",
+      address: "",
+      roles: "",
     },
   });
 
@@ -65,11 +75,11 @@ export const RegisterForm = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Add New User</Button>
+        <Button>New Member</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create System User</DialogTitle>
+          <DialogTitle>Register Member</DialogTitle>
           <DialogDescription>Fill in the details below:</DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -126,6 +136,67 @@ export const RegisterForm = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="contactNo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">Contact No</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isPending}
+                        placeholder="Enter contact number"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isPending}
+                        placeholder="Enter address"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="roles"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-semibold">Roles</FormLabel>
+                    <Select
+                      disabled={isPending}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                      <SelectItem value="Member">Member</SelectItem>          
+                        <SelectItem value="User">User</SelectItem>
+                        <SelectItem value="Viewer">Viewer</SelectItem>
+                        <SelectItem value="Administrator">Administrator</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <Button disabled={isPending} type="submit" className="w-full">
               Create an account
@@ -142,3 +213,4 @@ export const RegisterForm = () => {
     </Dialog>
   );
 };
+

@@ -9,6 +9,7 @@ import { Icons } from "@/components/ui/icons"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { RegisterForm } from "@/components/auth/register-form"
 
 export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const [isLoading, setIsLoading] = React.useState(false)
@@ -44,11 +45,11 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
   }
 
   return (
-    <div className={cn("grid gap-6", className)}>
+    <div className={cn("grid gap-4", className)}>
       <form onSubmit={onSubmit}>
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           <div className="grid gap-1">
-            <Label className="font-bold text-left" htmlFor="email">
+            <Label className="font-semibold text-left" htmlFor="email">
               Email
             </Label>
             <Input
@@ -63,8 +64,8 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
               required
             />
           </div>
-          <div className="grid gap-1 mt-1">
-            <Label className="font-bold text-left" htmlFor="password">
+          <div className="grid gap-1">
+            <Label className="font-semibold text-left" htmlFor="password">
               Password
             </Label>
             <Input
@@ -76,7 +77,7 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
               required
             />
           </div>
-          <Button type="submit" disabled={isLoading}>
+          <Button className="mt-2" type="submit" disabled={isLoading}>
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
@@ -88,7 +89,12 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">Or</span>
+        </div>
       </div>
+      <RegisterForm />
     </div>
   )
 }
+

@@ -42,6 +42,12 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
       icon: Calendar,
       active: pathname === "/dashboard/book-schedule",
     },
+    {
+      href: "/dashboard/user-management",
+      label: 'User Management',
+      icon: User,
+      active: pathname === "/dashboard/user-management",
+    },
   ]
 
   const monitoringRoutes = [
@@ -237,6 +243,12 @@ function MobileNav() {
           className="text-sm font-medium transition-colors hover:text-primary"
         >
           Monitoring
+        </Link>
+        <Link
+          href="/dashboard/user-management"
+          className="text-sm font-medium transition-colors hover:text-primary"
+        >
+          User Management
         </Link>
         {session?.user && (
           <Button 
