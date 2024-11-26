@@ -6,10 +6,9 @@ import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { UserAuthForm } from './components/auth-form'
 
-
 export default function SignIn() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100 via-white to-blue-50">
+    <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-200 via-white to-blue-50">
       {/* Background Pattern */}
       <div 
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:30px_30px] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]"
@@ -22,30 +21,29 @@ export default function SignIn() {
       </div>
 
       <div className="container relative z-10 mx-auto flex min-h-screen flex-col items-center justify-center px-4">
-  {/* Logo and Header */}
-{/* Logo and Header */}
-<motion.div
-  initial={{ opacity: 0, y: -20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
-  className="text-center"
->
-  <Image
-    src="https://utfs.io/f/pUvyWRtocgCVXkOFRZ4SQFwVzqytEldgvRNPo3K4W5XnAihe"
-    alt="Pickle Ball Logo"
-    width={900}
-    height={800}
-    className="mx-auto mb-[-50px] mt-[-70px]"
-    priority
-  />
-</motion.div>
+        {/* Logo and Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center w-full md:mt-[-70px] md:mb-[-50px] mb-8"
+        >
+          <Image
+            src="https://utfs.io/f/pUvyWRtocgCVXkOFRZ4SQFwVzqytEldgvRNPo3K4W5XnAihe"
+            alt="General Santos Business Park Pickle Ball Court"
+            width={1200}
+            height={400}
+            className="w-full h-auto max-h-[300px] object-contain px-4"
+            priority
+          />
+        </motion.div>
 
         {/* Main Card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="w-full max-w-[1000px]"
+          className="w-full max-w-[1000px] mt-4 sm:mt-8"
         >
           <Card className="overflow-hidden border-0 shadow-2xl">
             <div className="grid md:grid-cols-2">
@@ -81,20 +79,20 @@ export default function SignIn() {
               </div>
 
               {/* Right Side - Form */}
-              <div className="p-8 sm:p-12">
-                <div className="mx-auto max-w-md space-y-8">
+              <div className="p-6 sm:p-8 md:p-12">
+                <div className="mx-auto max-w-md space-y-6 sm:space-y-8">
                   <div className="space-y-2">
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                      Welcome Back 👋
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+                      Welcome👋
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-sm sm:text-base text-gray-600">
                       Sign in to book your next pickle ball session
                     </p>
                   </div>
 
                   <UserAuthForm />
 
-                  <div className="space-y-4 text-sm">
+                  <div className="space-y-4 text-xs sm:text-sm">
                     <p className="text-center text-gray-600">
                       Need assistance?{" "}
                       <Link 
