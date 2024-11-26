@@ -2,95 +2,153 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/ui/icons"
-import { toast } from "sonner"
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { LoginSchema } from "@/schemas"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { login } from "@/actions/login"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Loader, Lock, Mail } from 'lucide-react'
+import { FormError } from "@/components/form-error"
+import { FormSuccess } from "@/components/form-success"
 
-export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>) {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const router = useRouter();
+export const UserAuthForm = () => {
+  const [showTwoFactor] = React.useState(false)
+  const [error, setError] = React.useState<string | undefined>("")
+  const [success, setSuccess] = React.useState<string | undefined>("")
+  const [isPending, startTransition] = React.useTransition()
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
 
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: '/dashboard'
-      })
-
-      if (result?.error) {
-        toast.error(result.error)
-      } else if (result?.ok) {
-        router.push('/dashboard')
-        router.refresh()
-        toast.success("Logged in successfully")
-      }
-    } catch (error) {
-      console.error("Sign in error:", error)
-      toast.error("An error occurred. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
+  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    setError("")
+    setSuccess("")
+    
+    startTransition(() => {
+      login(values)
+        .then((data) => {
+          if (data?.error) {
+            form.reset()
+            setError(data.error)
+          }
+        })
+        .catch(() => setError("Something went wrong"))
+    })
   }
 
   return (
-    <div className={cn("grid gap-4", className)}>
-      <form onSubmit={onSubmit}>
-        <div className="grid gap-3">
-          <div className="grid gap-1">
-            <Label className="font-semibold text-left" htmlFor="email">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              disabled={isLoading}
-              required
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label className="font-semibold text-left" htmlFor="password">
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
-            />
-          </div>
-          {/* Forgot Password Link */}
-          <div className="text-right text-sm">
-            <Link href="/forgot-password" className="text-blue-500 hover:underline">
-              Forgot Password?
-            </Link>
-          </div>
-          <Button className="mt-2" type="submit" disabled={isLoading}>
-            {isLoading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+    <div className={cn("grid gap-4")}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-4">
+            {showTwoFactor ? (
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Two Factor Code</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          disabled={isPending}
+                          placeholder="123456"
+                          className="pl-10"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            disabled={isPending}
+                            type="email"
+                            className="pl-10"
+                            placeholder="your@email.com"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            {...field}
+                            disabled={isPending}
+                            placeholder="******"
+                            type="password"
+                            className="pl-10"
+                          />
+                        </div>
+                      </FormControl>
+                      <Button
+                        size="sm"
+                        variant="link"
+                        asChild
+                        className="px-0 font-normal"
+                      >
+                        <Link href="/auth/reset">
+                          Forgot password?
+                        </Link>
+                      </Button>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
-            Login
+          </div>
+          <FormError message={error} />
+          <FormSuccess message={success} />
+          <Button
+            disabled={isPending}
+            type="submit"
+            className="w-full"
+          >
+            {isPending ? (
+              <>
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+                {showTwoFactor ? "Confirming..." : "Signing in..."}
+              </>
+            ) : (
+              showTwoFactor ? "Confirm" : "Sign in"
+            )}
           </Button>
-        </div>
-      </form>
+        </form>
+      </Form>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -99,3 +157,4 @@ export function UserAuthForm({ className }: React.HTMLAttributes<HTMLDivElement>
     </div>
   )
 }
+

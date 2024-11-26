@@ -1,35 +1,43 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { auth } from '@/auth'
+import NextAuth from "next-auth";
 
-export async function middleware(request: NextRequest) {
-  const session = await auth()
-  const { pathname } = request.nextUrl
+import authConfig from "@/auth.config";
+import {
+  DEFAULT_LOGIN_REDIRECT,
+  apiAuthPrefix,
+  authRoutes,
+  publicRoutes,
+} from "@/routes";
 
-  // Public routes that don't require authentication
-  const publicRoutes = ['/auth/sign-in', '/auth/sign-up', '/auth/reset-password']
+const { auth } = NextAuth(authConfig);
 
-  // If it's a public route, allow access regardless of authentication status
-  if (publicRoutes.includes(pathname)) {
-    return NextResponse.next()
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
+
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+
+  if (isApiAuthRoute) {
+    return null;
   }
 
-  // If it's an auth page and the user is already logged in, redirect to dashboard
-  if (pathname.startsWith('/auth') && session) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  if (isAuthRoute) {
+    if (isLoggedIn) {
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+    }
+    return null;
   }
 
-  // If it's not an auth page and the user is not logged in, redirect to sign-in
-  if (!pathname.startsWith('/auth') && !session) {
-    return NextResponse.redirect(new URL('/auth/sign-in', request.url))
+  if (!isLoggedIn && !isPublicRoute) {
+    return Response.redirect(new URL("/auth/sign-in", nextUrl));
   }
 
-  // For all other cases, continue with the request
-  return NextResponse.next()
-}
+  return null;
+})
 
+// Optionally, don't invoke Middleware on some paths
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 }
+
