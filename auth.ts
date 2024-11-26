@@ -35,6 +35,7 @@ export const {
         session.user.name = token.name as string
         session.user.email = token.email
         session.user.id = token.id as string
+        session.user.roles = token.roles as string
       }
 
       return session

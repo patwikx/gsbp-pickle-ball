@@ -25,9 +25,13 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 
+
 const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
   const pathname = usePathname()
   const [isMonitoringOpen, setIsMonitoringOpen] = React.useState(false)
+  const { data: session } = useSession()
+  
+  if (!session?.user) return null
 
   const routes = [
     {
@@ -42,21 +46,25 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
       icon: Calendar,
       active: pathname === "/dashboard/book-schedule",
     },
-    {
-      href: "/dashboard/user-management",
-      label: 'User Management',
-      icon: User,
-      active: pathname === "/dashboard/user-management",
-    },
+    ...(session?.user?.roles?.includes('Admin') ? [
+      {
+        href: "/dashboard/user-management",
+        label: 'User Management',
+        icon: User,
+        active: pathname === "/dashboard/user-management",
+      },
+    ] : []),
   ]
 
   const monitoringRoutes = [
-    {
-      href: "/dashboard/monitoring",
-      label: 'Bookings',
-      description: "View and manage court bookings",
-      active: pathname === "/dashboard/monitoring",
-    },
+    ...(session?.user?.roles?.includes('Admin') ? [
+      {
+        href: "/dashboard/monitoring",
+        label: 'Bookings',
+        description: "View and manage court bookings",
+        active: pathname === "/dashboard/monitoring",
+      },
+    ] : []),
   ]
 
   return (
@@ -101,7 +109,7 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
             )}
           >
             <LayoutGrid className="w-4 h-4 mr-2" />
-            Monitoring
+            Monitoring {session?.user?.roles}
             <motion.div
               animate={{ rotate: isMonitoringOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
@@ -208,7 +216,7 @@ function MobileNav() {
   return (
     <div className="flex flex-col space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link href="/dashboard" className="flex items-center space-x-2">
           <Image src="/rdrdc.webp" alt="Logo" width={32} height={32} />
           <span className="font-bold">GSBP Pickle Ball Court</span>
         </Link>
