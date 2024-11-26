@@ -66,7 +66,7 @@ export default function SignIn() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                   >
-                    <h3 className="mb-2 text-2xl font-bold">RD Realty Development</h3>
+                    <h3 className="mb-2 text-2xl font-bold">RD Realty Development Corporation</h3>
                     <p className="mb-4 text-sm font-light">Your premier destination for pickle ball excellence</p>
                     <div className="flex space-x-2">
                       {Array.from({ length: 5 }).map((_, i) => (
