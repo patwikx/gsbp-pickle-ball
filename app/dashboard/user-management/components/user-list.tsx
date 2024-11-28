@@ -50,7 +50,7 @@ interface User {
   roles: string | null
   createdAt: Date | null
   renewalDate: Date | null
-  emailVerified: boolean
+  emailVerified: boolean | null
 }
 
 interface UserListProps {
@@ -165,10 +165,11 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
     if (selectedUser) {
       setIsUpdatingUser(true)
       try {
-        const result = await updateUser(selectedUser.id, { emailVerified: selectedUser.emailVerified })
+        const emailVerified = selectedUser.emailVerified ?? false; // Ensure emailVerified is boolean
+        const result = await updateUser(selectedUser.id, { emailVerified })
         if (result.success) {
           setIsEditUserOpen(false)
-          setUsers(users.map(user => user.id === selectedUser.id ? { ...user, emailVerified: selectedUser.emailVerified } : user))
+          setUsers(users.map(user => user.id === selectedUser.id ? { ...user, emailVerified } : user))
           toast({
             title: "Success",
             description: `${selectedUser.name}'s information has been updated successfully.`,
