@@ -66,6 +66,21 @@ export const RegisterUserSchema = z.object({
   roles: z.string().optional(),
 });
 
+export const MemberRegisterSchema = z.object({
+  email: z.string().email({
+    message: "Email is required",
+  }),
+  password: z.string().min(6, {
+    message: "Minimum 6 characters required",
+  }),
+  name: z.string().min(1, {
+    message: "First Name is required",
+  }),
+  contactNo: z.string().optional(),
+  address: z.string().optional(),
+  roles: z.literal("Member"),
+});
+
 export const RegisterTenantSchema = z.object({
   email: z.string().email({
     message: "Email is required",

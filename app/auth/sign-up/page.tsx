@@ -4,9 +4,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
-import { UserAuthForm } from './components/auth-form'
+import { MemberRegisterForm } from './components/register-member'
 
-export default function SignIn() {
+
+export default function SignUp() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-200 via-white to-blue-50">
       {/* Background Pattern */}
@@ -28,14 +29,6 @@ export default function SignIn() {
           transition={{ duration: 0.5 }}
           className="text-center w-full md:mt-[-70px] md:mb-[-50px] mb-8"
         >
-          <Image
-            src="https://utfs.io/f/pUvyWRtocgCVXkOFRZ4SQFwVzqytEldgvRNPo3K4W5XnAihe"
-            alt="General Santos Business Park Pickle Ball Court"
-            width={1200}
-            height={400}
-            className="w-full h-auto max-h-[300px] object-contain px-4"
-            priority
-          />
         </motion.div>
 
         {/* Main Card */}
@@ -64,8 +57,8 @@ export default function SignIn() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                   >
-                    <h3 className="mb-2 text-2xl font-bold">RD Realty Development Corporation</h3>
-                    <p className="mb-4 text-sm font-light">Your premier destination for pickle ball excellence</p>
+                    <h3 className="mb-2 text-2xl font-bold">Join Our Community</h3>
+                    <p className="mb-4 text-sm font-light">Experience the thrill of pickle ball at General Santos Business Park</p>
                     <div className="flex space-x-2">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <div
@@ -83,27 +76,27 @@ export default function SignIn() {
                 <div className="mx-auto max-w-md space-y-6 sm:space-y-8">
                   <div className="space-y-2">
                     <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
-                      Welcome👋
+                      Create Account 🎾
                     </h2>
                     <p className="text-sm sm:text-base text-gray-600">
-                      Sign in to book your next pickle ball session
+                      Join us and start your pickle ball journey today
                     </p>
                   </div>
 
-                  <UserAuthForm />
+                  <MemberRegisterForm />
 
                   <div className="space-y-2 text-xs sm:text-sm">
                     <p className="text-center text-gray-600">
-                      Need assistance?{" "}
+                      Already have an account?{" "}
                       <Link 
-                        href="/support" 
+                        href="/auth/sign-in" 
                         className="font-medium text-blue-600 transition-colors hover:text-blue-700"
                       >
-                        Contact our support team
+                        Sign in here
                       </Link>
                     </p>
                     <p className="text-center text-xs text-gray-500">
-                      By continuing, you agree to our{" "}
+                      By signing up, you agree to our{" "}
                       <Link
                         href="/terms"
                         className="underline underline-offset-4 hover:text-green-600"

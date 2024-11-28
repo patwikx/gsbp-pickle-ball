@@ -10,10 +10,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { HeaderFrontPage } from '@/components/front-page-header'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 export default function EnhancedHomePage() {
   const [activeFeature, setActiveFeature] = useState(0)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const router = useRouter();
 
   const features = [
     { 
@@ -281,7 +283,7 @@ export default function EnhancedHomePage() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 text-lg py-6">Become a Member</Button>
+                <Button onClick={() => router.push('/auth/sign-up')} className="w-full bg-blue-600 text-white hover:bg-blue-700 text-lg py-6">Become a Member</Button>
               </CardFooter>
             </Card>
           </div>

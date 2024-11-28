@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { UserPlus } from "lucide-react";
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
@@ -75,7 +76,9 @@ export const RegisterForm = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>New Member</Button>
+        <Button>  <UserPlus className="h-4 w-4 mr-2" />
+                    Add New Member
+                    </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

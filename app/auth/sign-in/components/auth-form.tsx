@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -20,6 +21,7 @@ export const UserAuthForm = () => {
   const [error, setError] = React.useState<string | undefined>("")
   const [success, setSuccess] = React.useState<string | undefined>("")
   const [isPending, startTransition] = React.useTransition()
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -41,7 +43,7 @@ export const UserAuthForm = () => {
             setError(data.error)
           }
         })
-        .catch(() => setError("Something went wrong"))
+        .catch(() => setError("Your account is not activated yet."))
     })
   }
 
@@ -153,6 +155,18 @@ export const UserAuthForm = () => {
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
+      </div>
+      <div className="text-center">
+        <span className="text-sm text-muted-foreground">Don&apos;t have an account? </span>
+        <Button 
+          variant="link" 
+          className="p-0"
+          onClick={() => router.push('/auth/sign-up')}
+        >
+          <span className="text-sm font-semibold">
+            Sign up now
+          </span>
+        </Button>
       </div>
     </div>
   )

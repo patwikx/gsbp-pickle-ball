@@ -1,6 +1,6 @@
 'use server'
 
-import { NewPasswordSchema, RegisterUserSchema, ResetSchema, SettingsSchema } from "@/schemas";
+import { MemberRegisterSchema, NewPasswordSchema, RegisterUserSchema, ResetSchema, SettingsSchema } from "@/schemas";
 
 import {  getUserByEmail, getUserById } from "@/data/user";
 
@@ -128,6 +128,58 @@ import { revalidatePath } from "next/cache";
 
 
 
+  export const memberRegister = async (values: z.infer<typeof MemberRegisterSchema>) => {
+    const validatedFields = MemberRegisterSchema.safeParse(values);
+  
+    if (!validatedFields.success) {
+      return { error: "Invalid fields!" };
+    }
+  
+    const { email, password, name, roles, contactNo, address } = validatedFields.data;
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const existingUser = await getUserByEmail(email);
+  
+    if (existingUser) {
+      return { error: "Email already in use!" };
+    }
+  
+    const now = new Date();
+    const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+  
+    const newUser = await prismadb.user.create({
+      data: {
+        email,
+        name,
+        password: hashedPassword,
+        renewalDate: oneYearFromNow,
+        contactNo,
+        address,
+        roles,
+      },
+    });
+  
+    revalidatePath('/dashboard/user-management')
+    return { success: "User registered successfully!", registrationId: newUser.id };
+  };
+
+  export async function fetchRegisteredPlayers() {
+    try {
+      const players = await prismadb.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      })
+      return players
+    } catch (error) {
+      console.error("Failed to fetch registered players:", error)
+      throw new Error("Failed to load registered players. Please try again.")
+    }
+  }
+
+
   export const registerUser = async (values: z.infer<typeof RegisterUserSchema>) => {
     const validatedFields = RegisterUserSchema.safeParse(values);
   
@@ -147,7 +199,7 @@ import { revalidatePath } from "next/cache";
     const now = new Date();
     const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
   
-    await prismadb.user.create({
+    const newUser = await prismadb.user.create({
       data: {
         email,
         name,
@@ -158,24 +210,8 @@ import { revalidatePath } from "next/cache";
         roles,
       },
     });
+  
     revalidatePath('/dashboard/user-management')
-    return { success: "User registered successfully!" };
+    return { success: "User registered successfully!", registrationId: newUser.id };
   };
-
-  export async function fetchRegisteredPlayers() {
-    try {
-      const players = await prismadb.user.findMany({
-        select: {
-          id: true,
-          name: true,
-          image: true,
-        },
-      })
-      return players
-    } catch (error) {
-      console.error("Failed to fetch registered players:", error)
-      throw new Error("Failed to load registered players. Please try again.")
-    }
-  }
-
   

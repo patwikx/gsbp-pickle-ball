@@ -17,14 +17,6 @@ export const {
     signIn: "/auth/sign-in",
     error: "/auth/error",
   },
-  events: {
-    async linkAccount({ user }) {
-      await prismadb.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() }
-      })
-    }
-  },
   callbacks: {
     async signIn({ user, account }) {
       // Allow OAuth without email verification
@@ -33,7 +25,7 @@ export const {
       const existingUser = await getUserById(user.id);
 
       // Prevent sign in without email verification
-      if (!existingUser?.emailVerified) return true;
+      if (!existingUser?.emailVerified) return false;
 
       return true;
     },

@@ -17,6 +17,7 @@ export async function getUsers(page = 1, pageSize = 10) {
         roles: true,
         createdAt: true,
         renewalDate: true,
+        emailVerified: true,
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -66,3 +67,16 @@ export async function deleteUser(userId: string) {
   }
 }
 
+export async function updateUser(userId: string, data: { emailVerified?: boolean }) {
+  try {
+    await prismadb.user.update({
+      where: { id: userId },
+      data: data,
+    })
+    revalidatePath('/dashboard/user-management')
+    return { success: true, message: "User updated successfully" }
+  } catch (error) {
+    console.error("Failed to update user:", error)
+    return { success: false, message: "Failed to update user" }
+  }
+}
