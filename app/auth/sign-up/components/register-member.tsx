@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { memberRegister } from "@/actions/queries";
-import { ConfirmationModal } from "@/app/confirmation/page";
+import ConfirmationModal from "@/app/confirmation/page";
+
 
 export const MemberRegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
