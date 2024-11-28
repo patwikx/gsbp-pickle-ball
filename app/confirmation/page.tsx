@@ -19,7 +19,7 @@ interface ConfirmationModalProps {
   registrationId: string;
 }
 
-export function ConfirmationModal({ isOpen, onClose, registrationId }: ConfirmationModalProps) {
+export default function ConfirmationModal({ isOpen, onClose, registrationId }: ConfirmationModalProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const saveAsImage = async () => {
