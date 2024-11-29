@@ -1,8 +1,15 @@
 import CourtLayout from "@/components/court-layout";
+import { getCurrentUser } from "@/hooks/use-current-user";
+import { redirect } from "next/navigation";
 
 
 
-export default function BookPage() {
+export default async function BookPage() {
+  const session = await getCurrentUser();
+  if (!session){
+    redirect('/auth/sign-in')
+  }
+ 
   return (
     <main className="container mx-auto p-4">
       <div className="flex flex-col md:flex-row gap-8">

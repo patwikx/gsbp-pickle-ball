@@ -10,7 +10,9 @@ import { redirect } from 'next/navigation';
 export default async function BookingMonitorPage() {
 
   const session = await getCurrentUser();
-
+  if (!session){
+    redirect('/auth/sign-in')
+  }
   // Check if the user is logged in and has the admin role
   if (!session || session.roles !== 'Administrator') {
     redirect('/dashboard')
