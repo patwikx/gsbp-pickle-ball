@@ -337,11 +337,11 @@ bg-white">
                       </div>
                       <div className="flex items-center space-x-4">
                         <Phone className="w-6 h-6 text-blue-600" />
-                        <p className="text-lg">+63 999 9999 9999</p>
+                        <p className="text-lg">+639 99 220 2427</p>
                       </div>
                       <div className="flex items-center space-x-4">
                         <Mail className="w-6 h-6 text-blue-600" />
-                        <p className="text-lg">info@rdrealty.com.ph</p>
+                        <p className="text-lg">pmd.associate@rdretailgroup.com.ph</p>
                       </div>
                     </div>
                   </CardContent>
