@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
 import { BookingDialog } from './pickle-dialog'
 import { Badge } from './ui/badge'
+import { sendBookingEmails } from '@/actions/email'
 
 export const revalidate = 0
 
@@ -86,7 +87,7 @@ export default function CourtLayout() {
         const [courtId, date, time] = slotId.split('|')
         return `${courtId}-${date}-${time}`
       })
-
+  
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -98,20 +99,32 @@ export default function CourtLayout() {
           invitedPlayers: invitedPlayers.map(p => p.id),
         }),
       })
-
+  
       if (!response.ok) {
         throw new Error('Failed to create booking')
       }
-
+  
+      const bookingData = await response.json()
+  
+      // Send emails to the booker and invited players
+      await sendBookingEmails({
+        bookerEmail: email,
+        bookerName: name,
+        invitedPlayers,
+        selectedSlots: formattedSlots,
+        courtName: courts.find(c => c.id === selectedCourt)?.name || `Court ${selectedCourt}`,
+        bookingIds: bookingData.bookings.map((booking: {id: string}) => booking.id)
+      })
+  
       setBookingStatus('success')
       
       selectedSlots.forEach(slotId => {
         updateTimeSlot(slotId, true)
       })
-
+  
       resetSelectedSlots()
       clearInvitedPlayers()
-      toast.success("Booking confirmed successfully!")
+      toast.success("Booking confirmed successfully and emails sent!")
     
       debouncedFetch(selectedDate)
     } catch (error) {

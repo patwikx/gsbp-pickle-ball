@@ -31,16 +31,16 @@ export async function POST(req: NextRequest) {
         // Format time as HH:mm (already in correct format from the split)
         const time = parts[4]
         
-        console.log('Parsed slot data:', { date, time })
+       // console.log('Parsed slot data:', { date, time })
 
         // Log the exact data being saved
-        console.log('Saving booking with:', {
-          courtId: parseInt(courtId),
-          date,
-          time,
-          userId: session.user.id,
-          invitedPlayers
-        })
+    //    console.log('Saving booking with:', {
+       //   courtId: parseInt(courtId),
+      //    date,
+      //    time,
+      //    userId: session.user.id,
+      //    invitedPlayers
+      //  })
 
         return prisma.booking.create({
           data: {
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       })
     )
 
-    console.log('All bookings created:', bookings)
+    // console.log('All bookings created:', bookings)
 
     return NextResponse.json({ 
       success: true, 
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       }))
     })
   } catch (error) {
-    console.error('Error creating bookings:', error)
+   // console.error('Error creating bookings:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'An unexpected error occurred' },
       { status: 500 }

@@ -55,7 +55,7 @@ export function BookingDialog({
         setInviteEmail("")
         toast({
           title: "Success",
-          description: `${user.name} has been invited`,
+          description: `${user.name} has been added.`,
         })
       } else {
         toast({
@@ -151,7 +151,7 @@ export function BookingDialog({
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-primary">Invite Players</h3>
+                  <h3 className="text-lg font-semibold text-primary">Add Guest(s) players</h3>
                   <Badge variant="secondary" className="font-medium">
                     {3 - invitedPlayers.length} spot{3 - invitedPlayers.length !== 1 ? 's' : ''} left
                   </Badge>

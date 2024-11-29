@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ bookedTimeSlots, currentPlayers })
   } catch (error) {
-    console.error('Error fetching booked slots:', error)
+    //console.error('Error fetching booked slots:', error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'An unexpected error occurred' },
       { status: 500 }
