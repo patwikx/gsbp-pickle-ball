@@ -119,7 +119,7 @@ export async function sendBookingEmails(params: {
                         <tr>
                           <td style="padding: 20px;">
                             <h3 style="color: #1e40af; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Booking Details</h3>
-                            <p style="margin: 0 0 10px;"><strong>Booking ID:</strong> ${bookingIds}</p>
+                            <p style="margin: 0 0 10px;"><strong>Booking ID:</strong> ${bookingIds[0]}</p>
                             <p style="margin: 0 0 10px;"><strong>Court:</strong> ${courtName}</p>
                             
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: separate; border-spacing: 0; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; margin-top: 15px;">
