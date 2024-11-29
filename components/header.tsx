@@ -24,15 +24,16 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
+import { useCurrentUser } from '@/lib/auth'
 
 const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
   const pathname = usePathname()
   const [isMonitoringOpen, setIsMonitoringOpen] = React.useState(false)
-  const { data: session } = useSession()
+  const user = useCurrentUser();
   
-  if (!session?.user) return null
+  if (!user) return null
 
-  const isAdmin = session?.user?.roles?.includes('Administrator')
+  const isAdmin = user?.roles?.includes('Administrator')
 
   const routes = [
     {
@@ -154,12 +155,12 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
 }
 
 function UserNav() {
-  const { data: session } = useSession()
+  const user = useCurrentUser();
   
-  if (!session?.user) return null
+  if (!user) return null
 
-  const initials = session.user.name
-  ? session.user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+  const initials = user.name
+  ? user.name.split(' ').map(n => n[0]).join('').toUpperCase()
   : '??'
   
   return (
@@ -170,10 +171,10 @@ function UserNav() {
           className="relative h-10 flex items-center space-x-2 rounded-lg hover:bg-accent"
         >
           <Avatar className="h-8 w-8">
-            {session.user.image ? (
+            {user.image ? (
               <Image
-                src={session.user.image}
-                alt={session.user.name || 'User avatar'}
+                src={user.image}
+                alt={user.name || 'User avatar'}
                 width={32}
                 height={32}
               />
@@ -182,16 +183,16 @@ function UserNav() {
             )}
           </Avatar>
           <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">{session.user.name}</span>
-            <span className="text-xs text-muted-foreground">{session.user.email}</span>
+            <span className="text-sm font-medium">{user.name}</span>
+            <span className="text-xs text-muted-foreground">{user.email}</span>
           </div>
           <ChevronDown className="h-4 w-4 ml-2" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <div className="flex items-center justify-start gap-2 p-2 md:hidden">
-          <span className="text-sm font-medium">{session.user.name}</span>
-          <span className="text-xs text-muted-foreground">{session.user.email}</span>
+          <span className="text-sm font-medium">{user.name}</span>
+          <span className="text-xs text-muted-foreground">{user.email}</span>
         </div>
         <DropdownMenuSeparator className="md:hidden" />
         <DropdownMenuSeparator />
