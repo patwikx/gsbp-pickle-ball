@@ -32,7 +32,7 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
   
   if (!session?.user) return null
 
-  const isAdmin = session?.user?.roles?.includes('Admin')
+  const isAdmin = session?.user?.roles?.includes('Administrator')
 
   const routes = [
     {

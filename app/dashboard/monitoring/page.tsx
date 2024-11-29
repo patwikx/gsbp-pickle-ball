@@ -12,7 +12,7 @@ export default async function BookingMonitorPage() {
   const session = await getCurrentUser();
 
   // Check if the user is logged in and has the admin role
-  if (!session || session.roles !== 'Admin') {
+  if (!session || session.roles !== 'Administrator') {
     redirect('/dashboard')
   }
   return (
