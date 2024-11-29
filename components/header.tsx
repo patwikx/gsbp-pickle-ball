@@ -157,20 +157,33 @@ function UserNav() {
   const { data: session } = useSession()
   
   if (!session?.user) return null
+
+  const initials = session.user.name
+  ? session.user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+  : '??'
   
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+<DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
           className="relative h-10 flex items-center space-x-2 rounded-lg hover:bg-accent"
         >
           <Avatar className="h-8 w-8">
-            <AvatarFallback>P</AvatarFallback>
+            {session.user.image ? (
+              <Image
+                src={session.user.image}
+                alt={session.user.name || 'User avatar'}
+                width={32}
+                height={32}
+              />
+            ) : (
+              <AvatarFallback>{initials}</AvatarFallback>
+            )}
           </Avatar>
           <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">Patrick Miranda</span>
-            <span className="text-xs text-muted-foreground">patricklacapmiranda@gmail.com</span>
+            <span className="text-sm font-medium">{session.user.name}</span>
+            <span className="text-xs text-muted-foreground">{session.user.email}</span>
           </div>
           <ChevronDown className="h-4 w-4 ml-2" />
         </Button>

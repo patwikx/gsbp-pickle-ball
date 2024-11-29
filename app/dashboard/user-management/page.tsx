@@ -1,9 +1,17 @@
 import { Suspense } from 'react'
+import { redirect } from 'next/navigation'
 import { UserList } from './components/user-list'
 import { getUsers } from './components/user-management'
-
+import { getCurrentUser } from '@/hooks/use-current-user'
 
 export default async function UserManagementPage() {
+  const session = await getCurrentUser();
+
+  // Check if the user is logged in and has the admin role
+  if (!session || session.roles !== 'Admin') {
+    redirect('/dashboard')
+  }
+
   const { users, totalUsers } = await getUsers()
 
   return (
