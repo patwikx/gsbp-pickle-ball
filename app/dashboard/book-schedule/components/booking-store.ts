@@ -119,7 +119,7 @@ export const useBookingStore = create<BookingStore>((set, get) => ({
         slots[court.id] = []
         
         // Generate time slots from 6:00 AM to 10:00 PM
-        for (let hour = 6; hour <= 23; hour++) {
+        for (let hour = 5; hour <= 23; hour++) {
           const paddedHour = hour.toString().padStart(2, '0')
           const timeStr = `${paddedHour}:00`
           const slotId = `${court.id}|${date}|${timeStr}`

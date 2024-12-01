@@ -302,7 +302,6 @@ export default function EnhancedHomePage() {
                     "Priority booking",
                     "Access to all facilities",
                     "Participation in members-only events",
-                    "Discounts on pro shop items",
                     "Free guest passes (2 per year)"
                   ].map((feature, i) => (
                     <li key={i} className="flex items-center">
@@ -357,12 +356,6 @@ export default function EnhancedHomePage() {
                       <div className="flex items-start space-x-4">
                         <MapPin className="w-6 h-6 text-blue-600 mt-1" />
                         <p className="text-lg">General Santos Business Park, National Highway, Philippines</p>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <Clock className="w-6 h-6 text-blue-600 mt-1" />
-                        <div>
-                          <p className='text-lg'>24/7 Pickleball Court</p>
-                        </div>
                       </div>
                       <div className="flex items-center space-x-4">
                         <Phone className="w-6 h-6 text-blue-600" />
