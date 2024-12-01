@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,6 +11,17 @@ import Link from 'next/link'
 import { HeaderFrontPage } from '@/components/front-page-header'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '400px'
+};
+
+const center = {
+  lat: 6.1205169, // Replace with the actual latitude of your pickle ball court
+  lng: 125.1841202 // Replace with the actual longitude of your pickle ball court
+};
 
 export default function EnhancedHomePage() {
   const [activeFeature, setActiveFeature] = useState(0)
@@ -74,6 +85,14 @@ export default function EnhancedHomePage() {
     return () => clearInterval(timer)
   })
 
+  const mapOptions = useMemo((): google.maps.MapOptions => ({
+    disableDefaultUI: false,
+    clickableIcons: false,
+    scrollwheel: true,
+    mapTypeControlOptions: {
+      mapTypeIds: ['roadmap', 'satellite']
+    }
+  }), [])
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -111,18 +130,18 @@ export default function EnhancedHomePage() {
           </div>
         </section>
 
-        {/* Main Content Section */}
+        {/* Main Content Section with Google Maps */}
         <section className="relative w-full py-12 md:py-24">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="grid gap-8 items-center">
-              <div className="flex flex-col space-y-4 text-center lg:text-left">
+            <div className="grid gap-8 items-center lg:grid-cols-2">
+              <div className="flex flex-col space-y-4">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                   Elevate your game at General Santos Business Park Pickle Ball Court
                 </h1>
-                <p className="max-w-[700px] text-zinc-500 md:text-xl mx-auto lg:mx-0">
+                <p className="max-w-[700px] text-zinc-500 md:text-xl">
                   Experience the fastest-growing sport in our state-of-the-art facility. Join the pickle ball revolution today!
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <Button 
                     size="lg" 
                     className="bg-[#1D4ED8] text-white hover:bg-blue-700"
@@ -139,10 +158,21 @@ export default function EnhancedHomePage() {
                   </Button>
                 </div>
               </div>
+              <div className="w-full h-[400px]">
+                <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
+                  <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    center={center}
+                    zoom={19}
+                    options={mapOptions}
+                  >
+                    <Marker position={center} />
+                  </GoogleMap>
+                </LoadScript>
+              </div>
             </div>
           </div>
         </section>
-
 
         {/* Features Section */}
         <section id="features" className="w-full py-24 bg-gradient-to-b from-white to-blue-50">
@@ -290,8 +320,7 @@ export default function EnhancedHomePage() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="w-full py-24 
-bg-white">
+        <section id="contact" className="w-full py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-zinc-900">Get in Touch</h2>
             <div className="grid gap-12 lg:grid-cols-2">
