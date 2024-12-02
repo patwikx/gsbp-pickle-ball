@@ -355,7 +355,7 @@ export default function EnhancedHomePage() {
                     <div className="space-y-4">
                       <div className="flex items-start space-x-4">
                         <MapPin className="w-6 h-6 text-blue-600 mt-1" />
-                        <p className="text-lg">General Santos Business Park, National Highway, Philippines</p>
+                        <p className="text-lg">General Santos Business Park, National Highway, General Santos City, Philippines</p>
                       </div>
                       <div className="flex items-center space-x-4">
                         <Phone className="w-6 h-6 text-blue-600" />
