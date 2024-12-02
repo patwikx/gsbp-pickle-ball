@@ -262,9 +262,9 @@ export default function EnhancedHomePage() {
             <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-zinc-900">What Our Players Say</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { name: "Alex Johnson", comment: "The courts are top-notch and the staff is incredibly friendly. Best pickle ball experience in GenSan!" },
-                { name: "Maria Garcia", comment: "I've improved my game so much thanks to the coaching here. Highly recommend for players of all levels." },
-                { name: "David Lee", comment: "The extended hours are fantastic. I can come after work and still get a great game in." }
+                { name: "Ceazar R.", comment: "The courts are top-notch and the staff is incredibly friendly. Best pickle ball experience in GenSan!" },
+                { name: "Larry P.", comment: "I've improved my game so much thanks to the coaching here. Highly recommend for players of all levels." },
+                { name: "Kristian Q.", comment: "The extended hours are fantastic. I can come after work and still get a great game in." }
               ].map((testimonial, index) => (
                 <Card key={index} className="transition-all hover:shadow-lg">
                   <CardHeader>
