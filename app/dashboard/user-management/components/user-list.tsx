@@ -80,7 +80,8 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
 
   const filteredUsers = users.filter(user => 
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.id?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const paginatedUsers = filteredUsers.slice((page - 1) * pageSize, page * pageSize)
@@ -287,7 +288,7 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                                 setIsEditUserOpen(true)
                               }}>
                                 <Edit className="mr-2 h-4 w-4" />
-                                <span>Edit User</span>
+                                <span>Update Member Status</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => {
                                 setSelectedUser(user)

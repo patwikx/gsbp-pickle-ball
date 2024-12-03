@@ -3,7 +3,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Menu, ChevronDown, Home, Calendar, LayoutGrid, LogOut, Bell, User,} from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
@@ -156,6 +156,7 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
 
 function UserNav() {
   const user = useCurrentUser();
+  const router = useRouter();
   
   if (!user) return null
 
@@ -197,7 +198,7 @@ function UserNav() {
         <DropdownMenuSeparator className="md:hidden" />
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/dashboard/my-account")}>
             <User className="mr-2 h-4 w-4" />
             <span>Account</span>
           </DropdownMenuItem>
