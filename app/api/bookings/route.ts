@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     const bookings = await Promise.all(
       selectedSlots.map(async (slotId: string) => {
-        console.log('Processing slot:', slotId)
+        //console.log('Processing slot:', slotId)
         
         // Parse the slot format: "2-2024-11-22-10:00" into parts
         const parts = slotId.split('-')

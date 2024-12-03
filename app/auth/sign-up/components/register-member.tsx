@@ -5,7 +5,6 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-
 import { MemberRegisterSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,14 +19,11 @@ import { Button } from "@/components/ui/button";
 import { memberRegister } from "@/actions/queries";
 import ConfirmationModal from "./modal-confirmation";
 
-
-
 export const MemberRegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [registrationId, setRegistrationId] = useState<string>("");
-
 
   const form = useForm<z.infer<typeof MemberRegisterSchema>>({
     resolver: zodResolver(MemberRegisterSchema),
@@ -54,6 +50,10 @@ export const MemberRegisterForm = () => {
           } else {
             setError("Registration failed. Please try again.");
           }
+        })
+        .catch((error) => {
+          console.error("Registration error:", error);
+          setError("An unexpected error occurred. Please try again.");
         });
     });
   };

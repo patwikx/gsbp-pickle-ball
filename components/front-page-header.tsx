@@ -82,7 +82,7 @@ export function HeaderFrontPage() {
             size="sm"
             className="md:hidden mr-2"
           >
-            <LogIn className="mr-2 h-4 w-4" /> Login
+            <LogIn className="mr-2 h-4 w-4" /> Login / Sign-up
           </Button>
         </div>
 
@@ -110,7 +110,7 @@ export function HeaderFrontPage() {
           <Button
             onClick={() => router.push('/auth/sign-in')}
           >
-            <LogIn className="mr-2 h-4 w-4" /> Login
+            <LogIn className="mr-2 h-4 w-4" /> Login / Sign-up
           </Button>
         </div>
       </div>

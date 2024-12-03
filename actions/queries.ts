@@ -10,6 +10,7 @@ import { getPasswordResetTokenByToken } from "@/data/password-reset-token";
 import { prismadb } from "@/lib/db";
 import { getCurrentUser } from "@/hooks/use-current-user";
 import { revalidatePath } from "next/cache";
+import { sendRegistrationEmail } from "./send-registration-email";
 
 
 
@@ -147,20 +148,34 @@ import { revalidatePath } from "next/cache";
     const now = new Date();
     const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
   
-    const newUser = await prismadb.user.create({
-      data: {
+    try {
+      const newUser = await prismadb.user.create({
+        data: {
+          email,
+          name,
+          password: hashedPassword,
+          renewalDate: oneYearFromNow,
+          contactNo,
+          address,
+          roles,
+        },
+      });
+  
+      // Send registration confirmation email
+      await sendRegistrationEmail({
+        contactNo: contactNo ?? null,
+        address: address ?? null,
         email,
         name,
-        password: hashedPassword,
-        renewalDate: oneYearFromNow,
-        contactNo,
-        address,
-        roles,
-      },
-    });
+        registrationId: newUser.id,
+      });
   
-    revalidatePath('/dashboard/user-management')
-    return { success: "User registered successfully!", registrationId: newUser.id };
+      revalidatePath('/dashboard/user-management');
+      return { success: "User registered successfully!", registrationId: newUser.id };
+    } catch (error) {
+      console.error("Registration failed:", error);
+      return { error: "Registration failed. Please try again." };
+    }
   };
 
   export async function fetchRegisteredPlayers() {
