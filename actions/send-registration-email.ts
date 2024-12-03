@@ -99,7 +99,7 @@ export async function sendRegistrationEmail(params: {
                             <p style="margin: 0 0 10px;"><strong>Registration ID:</strong> ${registrationId}</p>
                             <p style="margin: 0 0 10px;"><strong>Name:</strong> ${name}</p>
                             <p style="margin: 0 0 10px;"><strong>Email:</strong> ${email}</p>
-                            <p style="margin: 0 0 10px;"><strong>Email:</strong> ${contactNo}</p>
+                            <p style="margin: 0 0 10px;"><strong>Contact No.:</strong> ${contactNo}</p>
                             <p style="margin: 0 0 10px;"><strong>Address:</strong> ${address}</p>
                           </td>
                         </tr>
