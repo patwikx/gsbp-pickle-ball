@@ -24,5 +24,24 @@ export interface User {
     upcoming: number
     past: number
   }
+
+  export interface Court {
+    id: number
+    name: string
+  }
+  
+  export interface TimeSlot {
+    id: string
+    time: string
+    isBooked: boolean
+  }
+  
+  export interface Player {
+    id: string
+    name: string
+    image?: string
+  }
+  
+  export type BookingStatus = 'idle' | 'loading' | 'success' | 'error'
   
   
