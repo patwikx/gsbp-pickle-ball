@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Users, Clock } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 interface Player {
@@ -76,9 +76,6 @@ export function CourtCard({
                               <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
                             </Avatar>
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{player.name}</p>
-                          </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ))}

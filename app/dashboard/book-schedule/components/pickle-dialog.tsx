@@ -47,7 +47,7 @@ export function BookingDialog({
 
   const handleInvitePlayer = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (inviteEmail && invitedPlayers.length < 3) {
+    if (inviteEmail && invitedPlayers.length < 5) {
       setIsLookingUp(true)
       const user = await lookupUserByEmail(inviteEmail)
       setIsLookingUp(false)
@@ -65,10 +65,10 @@ export function BookingDialog({
           variant: "destructive",
         })
       }
-    } else if (invitedPlayers.length >= 3) {
+    } else if (invitedPlayers.length >= 5) {
       toast({
         title: "Error",
-        description: "Maximum of 4 players per court (including you)",
+        description: "Maximum of 6 players per court (including you)",
         variant: "destructive",
       })
     }
@@ -154,7 +154,7 @@ export function BookingDialog({
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-primary">Add Guest(s) players</h3>
                   <Badge variant="secondary" className="font-medium">
-                    {3 - invitedPlayers.length} spot{3 - invitedPlayers.length !== 1 ? 's' : ''} left
+                    {6 - invitedPlayers.length -1} spot{6 - invitedPlayers.length - 1 !== 1 ? 's' : ''} left
                   </Badge>
                 </div>
                 <form onSubmit={handleInvitePlayer} className="flex gap-2 mb-4">
@@ -165,7 +165,7 @@ export function BookingDialog({
                     onChange={(e) => setInviteEmail(e.target.value)}
                     className="flex-grow"
                   />
-                  <Button type="submit" disabled={invitedPlayers.length >= 3 || isLookingUp}>
+                  <Button type="submit" disabled={invitedPlayers.length >= 5 || isLookingUp}>
                     {isLookingUp ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

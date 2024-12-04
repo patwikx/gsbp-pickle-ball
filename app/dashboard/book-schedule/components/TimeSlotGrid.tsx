@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Clock, Loader } from 'lucide-react'
+import { CheckCircle, Clock, Loader, Users } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { TimeSlot } from '@/types/bookings'
@@ -86,12 +86,18 @@ function TimeSlotCard({ slot, isSelected, onToggle, isPast }: TimeSlotCardProps)
             </div>
             <div className="flex items-center gap-1 text-xs mt-2">
               {slot.isBooked && !isPast ? (
-                <span className="text-red-600">Reserved</span>
+                <>
+                <Users className="w-3 h-3" />
+                <span className="truncate">Reserved</span>
+              </>
+            
               ) : !isPast ? (
+                <> 
+                <CheckCircle className="w-3 h-3" />
                 <span className="text-emerald-600">Available</span>
-              ) : (
-                <span className="text-gray-500">Past</span>
-              )}
+                 </>
+                
+              ) : null}
             </div>
           </div>
         </TooltipTrigger>
