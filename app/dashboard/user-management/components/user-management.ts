@@ -1,5 +1,6 @@
 'use server'
 
+import { sendActivationEmailSuccess } from "@/actions/send-activation-email"
 import { prismadb } from "@/lib/db"
 import { hash } from "bcryptjs"
 import { revalidatePath } from "next/cache"
@@ -69,10 +70,31 @@ export async function deleteUser(userId: string) {
 
 export async function updateUser(userId: string, data: { emailVerified?: boolean }) {
   try {
-    await prismadb.user.update({
+    const updatedUser = await prismadb.user.update({
       where: { id: userId },
       data: data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+      },
     })
+
+    // If the email is being verified, send the activation email
+    if (data.emailVerified && updatedUser.email && updatedUser.name) {
+      try {
+        await sendActivationEmailSuccess({
+          email: updatedUser.email,
+          name: updatedUser.name,
+          memberId: updatedUser.id,
+        });
+      } catch {
+       // console.error("Failed to send activation email:", emailError)
+        // Note: We're not returning here, as we still want to consider the user update successful
+      }
+    }
+
     revalidatePath('/dashboard/user-management')
     return { success: true, message: "User updated successfully" }
   } catch (error) {
