@@ -18,5 +18,11 @@ export interface User {
     totalBookings: number;
     todayBookings: number;
   }
+
+  export interface BookingStatsx {
+    total: number
+    upcoming: number
+    past: number
+  }
   
   

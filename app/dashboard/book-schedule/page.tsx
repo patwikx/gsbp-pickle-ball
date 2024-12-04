@@ -1,4 +1,4 @@
-import CourtLayout from "@/components/court-layout";
+import CourtLayout from "@/app/dashboard/book-schedule/components/court-layout";
 import { getCurrentUser } from "@/hooks/use-current-user";
 import { redirect } from "next/navigation";
 

@@ -17,8 +17,8 @@ import { toast } from 'sonner'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
-import { BookingDialog } from './pickle-dialog'
-import { Badge } from './ui/badge'
+import { BookingDialog } from '../../../../components/pickle-dialog'
+import { Badge } from '../../../../components/ui/badge'
 import { sendBookingEmails } from '@/actions/email'
 
 export const revalidate = 0
