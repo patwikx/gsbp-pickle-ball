@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { UserList } from './components/user-list'
 import { getUsers } from './components/user-management'
 import { getCurrentUser } from '@/hooks/use-current-user'
+import { Loader } from '@/components/ui/loader'
 
 export default async function UserManagementPage() {
   const session = await getCurrentUser();
@@ -18,8 +19,8 @@ export default async function UserManagementPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-4xl font-bold mb-8">User Management</h1>
-      <Suspense fallback={<div>Loading users...</div>}>
+
+      <Suspense fallback={<div><Loader /></div>}>
         <UserList initialUsers={users} totalUsers={totalUsers} />
       </Suspense>
     </div>

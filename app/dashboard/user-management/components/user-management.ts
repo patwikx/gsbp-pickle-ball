@@ -81,18 +81,15 @@ export async function updateUser(userId: string, data: { emailVerified?: boolean
       },
     })
 
-    // If the email is being verified, send the activation email
+    // Trigger email sending in the background without awaiting
     if (data.emailVerified && updatedUser.email && updatedUser.name) {
-      try {
-        await sendActivationEmailSuccess({
-          email: updatedUser.email,
-          name: updatedUser.name,
-          memberId: updatedUser.id,
-        });
-      } catch {
-       // console.error("Failed to send activation email:", emailError)
-        // Note: We're not returning here, as we still want to consider the user update successful
-      }
+      sendActivationEmailSuccess({
+        email: updatedUser.email,
+        name: updatedUser.name,
+        memberId: updatedUser.id,
+      }).catch((error) => {
+        console.error("Failed to send activation email:", error)
+      })
     }
 
     revalidatePath('/dashboard/user-management')
