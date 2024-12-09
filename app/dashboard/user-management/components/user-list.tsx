@@ -13,18 +13,19 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { UserTableSkeleton } from './user-table-skeleton'
-import { UserActions } from './user-actions'
 import { UserStatusBadge } from './user-status-badge'
 import { User, UserListProps } from '@/types/user'
 import { cn } from '@/lib/utils'
 import { changeUserPassword, deleteUser, updateUser } from './user-management'
 import { RegisterForm } from '@/components/auth/register-form'
 import { UserDialogs } from './users-dialog'
+import { UserActions } from './user-actions'
+
 
 export const revalidate = 0
 
@@ -184,6 +185,7 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                   <TableHead>Registration</TableHead>
                   <TableHead>Renewal</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Payment</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -228,8 +230,23 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                           onStatusChange={(status) => handleUpdateUserStatus(user.id, status)}
                         />
                       </TableCell>
+                      <TableCell>
+              {user.proofPayment && user.proofPayment !== 'about:blank' ? (
+                <a
+                  href={user.proofPayment}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View
+                </a>
+              ) : (
+                'N/A'
+              )}
+            </TableCell>
                       <TableCell className="text-right">
-                        <UserActions
+                        <UserActions       
                           user={user}
                           onChangePassword={(user) => {
                             setSelectedUser(user)
@@ -242,6 +259,10 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                           onDeleteUser={(user) => {
                             setSelectedUser(user)
                             setIsDeleteConfirmOpen(true)
+                          }}
+                          onViewPayments={(user) => {
+                            setSelectedUser(user)
+                            
                           }}
                         />
                       </TableCell>

@@ -19,6 +19,7 @@ export async function getUsers(page = 1, pageSize = 10) {
         createdAt: true,
         renewalDate: true,
         emailVerified: true,
+        proofPayment: true,
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -97,5 +98,24 @@ export async function updateUser(userId: string, data: { emailVerified?: boolean
   } catch (error) {
     console.error("Failed to update user:", error)
     return { success: false, message: "Failed to update user" }
+  }
+}
+
+export async function getUserPayments(userId: string) {
+  try {
+    const payments = await prismadb.user.findMany({
+      where: { id: userId },
+      select: {
+        id: true,
+        createdAt: true,
+        proofPayment: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    return { success: true, payments }
+  } catch (error) {
+    console.error("Failed to fetch user payments:", error)
+    return { success: false, message: "Failed to fetch user payments" }
   }
 }

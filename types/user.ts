@@ -9,6 +9,7 @@ export interface User {
     createdAt: Date | null
     renewalDate: Date | null
     emailVerified: boolean | null
+    proofPayment: string | null
   }
   
   export interface UserListProps {

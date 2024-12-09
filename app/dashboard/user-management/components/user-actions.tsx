@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Lock, MoreHorizontal, Pencil, Trash } from 'lucide-react'
+import { Edit,  FileText, Lock, MoreHorizontal, Trash } from 'lucide-react'
 import { User } from '@/types/user'
 
 interface UserActionsProps {
@@ -15,9 +15,11 @@ interface UserActionsProps {
   onChangePassword: (user: User) => void
   onEditUser: (user: User) => void
   onDeleteUser: (user: User) => void
+  onViewPayments: (user: User) => void
 }
 
-export function UserActions({ user, onChangePassword, onEditUser, onDeleteUser }: UserActionsProps) {
+
+export function UserActions({ user, onChangePassword, onEditUser, onDeleteUser, onViewPayments }: UserActionsProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,9 +30,13 @@ export function UserActions({ user, onChangePassword, onEditUser, onDeleteUser }
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => onViewPayments(user)} className="cursor-pointer">
+          <FileText className="mr-2 h-4 w-4" />
+          <span>Payments</span>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onEditUser(user)} className="cursor-pointer">
-          <Pencil className="mr-2 h-4 w-4" />
-          <span>Edit User</span>
+          <Edit className="mr-2 h-4 w-4" />
+          <span>Edit Member</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onChangePassword(user)} className="cursor-pointer">
           <Lock className="mr-2 h-4 w-4" />
