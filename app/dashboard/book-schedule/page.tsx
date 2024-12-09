@@ -152,20 +152,20 @@ export default function CourtLayout() {
           <CardContent>
             <div className="grid sm:grid-cols-2 gap-4">
               {courts.map((court) => (
-                                                                                                                                <CourtCard
-                                                                                                                                                key={court.id}
-                                                                                                                                                id={court.id}
-                                                                                                                                                name={court.name}
-                                                                                                                                                selected={selectedCourt === court.id}
-                                                                                                                                                currentPlayers={currentPlayers[court.id].map(player => ({
-                                                                                                                                                                ...player,
-                                                                                                                                                                image: player.image || undefined
-                                                                                                                                                })) || []}
-                                                                                                                                                currentBooking={currentBookings[court.id]}
-                                                                                                                                                onSelect={setSelectedCourt}
-                                                                                                                                />
-                                                                                                                ))}
-                                                                                                </div>
+            <CourtCard
+             key={court.id}
+             id={court.id}
+             name={court.name}
+             selected={selectedCourt === court.id}
+             currentPlayers={currentPlayers[court.id].map(player => ({
+              ...player,
+             image: player.image || undefined
+             })) || []}
+             currentBooking={currentBookings[court.id]}
+             onSelect={setSelectedCourt}
+             />
+             ))}
+            </div>
           </CardContent>
         </Card>
 

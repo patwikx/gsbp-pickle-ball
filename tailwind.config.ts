@@ -1,6 +1,6 @@
-import type { Config } from "tailwindcss";
+import { withUt } from "uploadthing/tw";
 
-const config: Config = {
+export default withUt({
     darkMode: ["class"],
     content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,6 +9,15 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		backgroundImage: {
+  			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+  			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
+  		},
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -51,11 +60,6 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		},
   		keyframes: {
   			'accordion-down': {
   				from: {
@@ -81,5 +85,5 @@ const config: Config = {
   	}
   },
   plugins: [require("tailwindcss-animate")],
-};
-export default config;
+});
+

@@ -136,7 +136,7 @@ import { sendRegistrationEmail } from "./send-registration-email";
       return { error: "Invalid fields!" };
     }
   
-    const { email, password, name, roles, contactNo, address } = validatedFields.data;
+    const { email, password, name, roles, contactNo, address, proofPayment } = validatedFields.data;
     const hashedPassword = await bcrypt.hash(password, 10);
   
     const existingUser = await getUserByEmail(email);
@@ -158,11 +158,12 @@ import { sendRegistrationEmail } from "./send-registration-email";
           contactNo,
           address,
           roles,
+          proofPayment,
         },
       });
   
       // Send registration confirmation email
-      await sendRegistrationEmail({
+       sendRegistrationEmail({
         contactNo: contactNo ?? null,
         address: address ?? null,
         email,

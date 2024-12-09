@@ -79,6 +79,7 @@ export const MemberRegisterSchema = z.object({
   contactNo: z.string().optional(),
   address: z.string().optional(),
   roles: z.literal("Member"),
+  proofPayment: z.string().optional(),
 });
 
 export const RegisterTenantSchema = z.object({

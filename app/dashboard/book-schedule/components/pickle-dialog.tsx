@@ -15,7 +15,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useBookingStore } from '@/app/dashboard/book-schedule/components/booking-store'
 import { toast } from '@/hooks/use-toast'
 
-
 interface BookingDialogProps {
   isOpen: boolean
   onClose: () => void
@@ -154,7 +153,7 @@ export function BookingDialog({
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-primary">Add Guest(s) players</h3>
                   <Badge variant="secondary" className="font-medium">
-                    {6 - invitedPlayers.length -1} spot{6 - invitedPlayers.length - 1 !== 1 ? 's' : ''} left
+                    {5 - invitedPlayers.length} spot{5 - invitedPlayers.length !== 1 ? 's' : ''} left
                   </Badge>
                 </div>
                 <form onSubmit={handleInvitePlayer} className="flex gap-2 mb-4">
@@ -303,3 +302,4 @@ export function BookingDialog({
     </Dialog>
   )
 }
+

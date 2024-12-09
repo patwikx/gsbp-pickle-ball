@@ -64,6 +64,7 @@ model User {
   invitedTo     Booking[]               @relation("InvitedPlayers")
   twoFactor     TwoFactorConfirmation[]
   ownedGroups   Group[]                 @relation("GroupOwner")
+  proofPayment  String?
   memberships   GroupMembership[]
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt

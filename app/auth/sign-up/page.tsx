@@ -1,11 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/card'
 import { MemberRegisterForm } from './components/register-member'
-
+import { PaymentOptions } from './components/payment-options'
 
 export default function SignUp() {
   return (
@@ -38,37 +37,11 @@ export default function SignUp() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="w-full max-w-[1000px] mt-4 sm:mt-8"
         >
-          <Card className="overflow-hidden border-0 shadow-2xl">
+          <Card className="overflow-hidden border-0 shadow-2xl mt-24">
             <div className="grid md:grid-cols-2">
-              {/* Left Side - Image */}
-              <div className="relative hidden md:block">
-                <div className="absolute inset-0 bg-gradient-to-br to-blue-900/90 mix-blend-multiply" />
-                <Image
-                  src="https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5"
-                  alt="RD Realty Development Corporation Building"
-                  className="h-full object-cover"
-                  width={500}
-                  height={700}
-                  priority
-                />
-                <div className="absolute inset-0 flex flex-col items-start justify-end p-8 text-white">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.5 }}
-                  >
-                    <h3 className="mb-2 text-2xl font-bold">Join Our Community</h3>
-                    <p className="mb-4 text-sm font-light">Experience the thrill of pickle ball at General Santos Business Park</p>
-                    <div className="flex space-x-2">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-1 w-8 rounded-full bg-white/60"
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                </div>
+              {/* Left Side - Payment Options */}
+              <div className="hidden md:block">
+                <PaymentOptions />
               </div>
 
               {/* Right Side - Form */}
@@ -121,4 +94,3 @@ export default function SignUp() {
     </div>
   )
 }
-
