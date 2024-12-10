@@ -3,16 +3,17 @@
 import { motion } from 'framer-motion'
 import { Building2, CreditCard, Phone, Mail } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import Image from 'next/image'
 
 export function PaymentOptions() {
   return (
-    <div className="relative h-full bg-gradient-to-br from-primary/90 to-primary p-6 sm:p-8 md:p-12">
+    <div className="relative h-full bg-gradient-to-br from-primary/90 to-primary p-4 sm:p-8 md:p-12">
       {/* Background Pattern */}
       <div 
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,theme(colors.primary-foreground/10)_1px,transparent_0)] [background-size:40px_40px]"
       />
       
-      <div className="relative space-y-6">
+      <div className="relative space-y-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -22,7 +23,7 @@ export function PaymentOptions() {
           <p className="mt-2 text-sm text-primary-foreground/80">Choose your preferred payment method</p>
         </motion.div>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -60,7 +61,7 @@ export function PaymentOptions() {
                   <h3 className="text-lg font-semibold text-card-foreground">Fund Transfer</h3>
                 </div>
                 <div className="space-y-2 pl-12 text-sm text-card-foreground/90">
-                  <p>BPI Account:</p>
+                  <Image src='/BPI.png' alt='BPI Account' width={60} height={25} />
                   <div className="space-y-1">
                     <p>
                       <span className="text-card-foreground/70">Account Name:</span>{" "}
@@ -68,12 +69,27 @@ export function PaymentOptions() {
                     </p>
                     <p>
                       <span className="text-card-foreground/70">Account Number:</span>{" "}
-                      <span className="font-bold">1241-12124-XXX</span>
+                      <span className="font-bold">2150-0024-11</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2 pl-12 text-sm text-card-foreground/90">
+                <Image src='/sbc.jpg' alt='BPI Account' width={125} height={50} />
+                  <div className="space-y-1">
+                    <p>
+                      <span className="text-card-foreground/70">Account Name:</span>{" "}
+                      <span className="font-bold">RD REALTY DEVELOPMENT CORPORATION</span>
+                    </p>
+                    <p>
+                      <span className="text-card-foreground/70">Account Number:</span>{" "}
+                      <span className="font-bold">411-014382-001</span>
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            
           </motion.div>
         </div>
 

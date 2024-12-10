@@ -175,17 +175,17 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead>Member ID</TableHead>
+                  <TableHead className='text-center'>Member ID</TableHead>
                   <TableHead className="w-[100px]">User</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Contact No.</TableHead>
                   <TableHead>Address</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Registration</TableHead>
-                  <TableHead>Renewal</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
+                  <TableHead className='text-center'>Registration</TableHead>
+                  <TableHead className='text-center'>Renewal</TableHead>
+                  <TableHead className='text-center'>Status</TableHead>
+                  <TableHead className='text-center'>Payment</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -230,7 +230,7 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                           onStatusChange={(status) => handleUpdateUserStatus(user.id, status)}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell className='text-center'>
               {user.proofPayment && user.proofPayment !== 'about:blank' ? (
                 <a
                   href={user.proofPayment}
