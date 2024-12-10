@@ -105,14 +105,14 @@ export default function SignIn() {
                     <p className="text-center text-xs text-gray-500">
                       By continuing, you agree to our{" "}
                       <Link
-                        href="/terms"
+                        href="/terms-of-service"
                         className="underline underline-offset-4 hover:text-green-600"
                       >
                         Terms of Service
                       </Link>{" "}
                       and{" "}
                       <Link
-                        href="/privacy"
+                        href="/privacy-policy"
                         className="underline underline-offset-4 hover:text-green-600"
                       >
                         Privacy Policy

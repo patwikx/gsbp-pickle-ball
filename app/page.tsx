@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check, Star, Facebook, Twitter, Instagram, ArrowRight, Clock, MapPin, Phone, Mail, Trophy, Coffee } from 'lucide-react'
+import { Check, Star, ArrowRight, Clock, MapPin, Phone, Mail, Trophy, Coffee } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { HeaderFrontPage } from '@/components/front-page-header'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { Footer } from '@/components/footer'
 
 const mapContainerStyle = {
   width: '100%',
@@ -374,53 +374,7 @@ export default function EnhancedHomePage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full py-12 bg-gray-900 text-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid gap-8 lg:grid-cols-4">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">About Us</h3>
-              <p className="text-gray-400">General Santos Business Park Pickle Ball Court - your premier destination for pickle ball in GenSan.</p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Quick Links</h3>
-              <ul className="space-y-2">
-                <li><Link href="#features" className="hover:text-blue-400 transition-colors">Features</Link></li>
-                <li><Link href="#about" className="hover:text-blue-400 transition-colors">About</Link></li>
-                <li><Link href="#membership" className="hover:text-blue-400 transition-colors">Membership</Link></li>
-                <li><Link href="#contact" className="hover:text-blue-400 transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Follow Us</h3>
-              <div className="flex space-x-4">
-                <Link href="#" className="hover:text-blue-400 transition-colors">
-                  <Facebook className="h-6 w-6" />
-                  <span className="sr-only">Facebook</span>
-                </Link>
-                <Link href="#" className="hover:text-blue-400 transition-colors">
-                  <Twitter className="h-6 w-6" />
-                  <span className="sr-only">Twitter</span>
-                </Link>
-                <Link href="#" className="hover:text-blue-400 transition-colors">
-                  <Instagram className="h-6 w-6" />
-                  <span className="sr-only">Instagram</span>
-                </Link>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Newsletter</h3>
-              <form className="flex space-x-2">
-                <Input type="email" placeholder="Enter your email" className="bg-gray-800 text-white border-gray-700" />
-                <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300">Subscribe</Button>
-              </form>
-            </div>
-          </div>
-          <div className="mt-12 text-center text-gray-400">
-            © 2024 General Santos Business Park Pickle Ball Court. All rights reserved.
-          </div>
-        </div>
-      </footer>
+     <Footer />
     </div>
   )
 }

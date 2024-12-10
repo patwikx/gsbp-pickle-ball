@@ -78,7 +78,7 @@ export default function SignUp() {
                       </Link>{" "}
                       and{" "}
                       <Link
-                        href="/privacy"
+                        href="/privacy-policy"
                         className="underline underline-offset-4 hover:text-green-600"
                       >
                         Privacy Policy

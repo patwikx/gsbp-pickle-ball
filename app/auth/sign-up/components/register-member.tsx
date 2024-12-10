@@ -195,7 +195,8 @@ export const MemberRegisterForm = () => {
             <label className="block text-center">
               <div className="flex flex-col items-center mt-4">
                 <label className="flex flex-col items-center p-4 border-2 border-dashed border-gray-400 rounded-lg cursor-pointer hover:border-gray-600 transition duration-300">
-                  <span className="text-center font-bold text-md mb-2 text-gray-600">Upload Proof of Payment</span>
+                  <span className="text-center font-bold text-md text-gray-600">Upload Proof of Payment</span>
+                  <span className="text-center font-bold text-md text-gray-600">(optional)</span>
                   <UploadButton
                     endpoint="proofPayment"
                     onClientUploadComplete={handleFileUpload}
