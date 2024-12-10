@@ -26,7 +26,6 @@ const sections: Section[] = [
   { id: 'safety', title: 'Safety and Maintenance' },
   { id: 'conduct', title: 'Code of Conduct' },
   { id: 'parking', title: 'Parking Policy' },
-  { id: 'cancellation', title: 'Cancellation and Refund Policy' },
   { id: 'liability', title: 'Limitation of Liability' },
   { id: 'termination', title: 'Termination' },
   { id: 'disputes', title: 'Governing Law and Disputes' },
@@ -207,7 +206,7 @@ function renderSectionContent(sectionId: string): JSX.Element {
             Membership Fee: Php1,000.00 per year
           </p>
           <p className="mt-4">
-            Payment Methods: We accept cash payment via GSBPPBC cashier.
+            Payment Methods: We accept cash payment via GSBPPBC cashier or online payment through fund transfer.
           </p>
           <p className="mt-4">
             Refund Policy: Membership fees are non-refundable and non-transferrable.
@@ -230,7 +229,7 @@ function renderSectionContent(sectionId: string): JSX.Element {
             Playing Duration: Each session is limited to confirmed booking hours.
           </p>
           <p className="mt-4">
-            We reserve the right to refuse or cancel any booking at our sole discretion. In such cases, we will provide a full refund of any fees paid.
+            We reserve the right to refuse or cancel any booking at our sole discretion.
           </p>
         </>
       );
@@ -290,17 +289,6 @@ function renderSectionContent(sectionId: string): JSX.Element {
           </p>
           <p className="mt-4">
             No Overnight Parking: Unauthorized vehicles left overnight are subject to a Php5,000.00 penalty per night unless explicitly authorized in writing by management.
-          </p>
-        </>
-      );
-    case 'cancellation':
-      return (
-        <>
-          <p>
-            Cancellations made at least 24 hours before the scheduled court time will receive a full refund. Cancellations made less than 24 hours before the scheduled court time are not eligible for a refund.
-          </p>
-          <p className="mt-4">
-            In case of inclement weather or unforeseen circumstances that render the courts unusable, we will offer a full refund or the option to reschedule your booking.
           </p>
         </>
       );

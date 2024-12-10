@@ -200,7 +200,7 @@ export default function EnhancedHomePage() {
               </div>
               <div className="flex items-center justify-center">
                 <Image
-                  src="/images/about-pickleball.jpg"
+                  src="https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp"
                   alt="Pickle Ball Court"
                   width={600}
                   height={400}
