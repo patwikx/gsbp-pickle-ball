@@ -1,89 +1,92 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check, Star, ArrowRight, Clock, MapPin, Phone, Mail, Trophy, Coffee } from 'lucide-react'
-import Image from 'next/image'
-import { HeaderFrontPage } from '@/components/front-page-header'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState,  useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import Image from 'next/image'
+import { motion } from 'framer-motion'
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
+import { ArrowRight, Check, Clock, MapPin, Phone, Mail, Trophy, Coffee } from 'lucide-react'
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { HeaderFrontPage } from '@/components/front-page-header'
 import { Footer } from '@/components/footer'
+import { HeroCarousel } from '@/components/hero-carousel'
+import { FeatureCard } from '@/components/feature-card'
+import { TestimonialCarousel } from '@/components/testimonial-card'
+import { ContactForm } from '@/components/contact-form'
 
 const mapContainerStyle = {
   width: '100%',
   height: '400px'
-};
+}
 
 const center = {
   lat: 6.1205169,
   lng: 125.1841202
-};
+}
+
+const features = [
+  { 
+    title: "State-of-the-art Courts", 
+    description: "4 professional-grade courts with premium surfaces for optimal play.",
+    icon: <MapPin className="h-8 w-8" />,
+    image: "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp"
+  },
+  { 
+    title: "Extended Hours", 
+    description: "Fully lit courts for evening games and flexible playing times.",
+    icon: <Clock className="h-8 w-8" />,
+    image: "https://utfs.io/f/a31312a4-ac64-4212-9b8e-1ffb880a0e76-hep9t5.webp"
+  },
+  { 
+    title: "Regular Tournaments", 
+    description: "Exciting tournaments and leagues for competitive play.",
+    icon: <Trophy className="h-8 w-8" />,
+    image: "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp"
+  },
+  { 
+    title: "Lounge Area", 
+    description: "Comfortable space to relax and socialize between games.",
+    icon: <Coffee className="h-8 w-8" />,
+    image: "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp"
+  }
+]
+
+const carouselImages = [
+  {
+    src: "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
+    title: "Christmas Sale! Up to 15% off on new members!", 
+    color: "bg-gradient-to-r from-red-600 to-red-400"
+  },
+  {
+    src: "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp",
+    title: "New Year Special Membership",
+    color: "bg-gradient-to-r from-blue-600 to-blue-400"
+  },
+  {
+    src: "https://utfs.io/f/a31312a4-ac64-4212-9b8e-1ffb880a0e76-hep9t5.webp",
+    title: "Weekend Tournament",
+    color: "bg-gradient-to-r from-green-600 to-green-400"
+  },
+  {
+    src: "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp",
+    title: "Summer Camp Registration Open",
+    color: "bg-gradient-to-r from-orange-600 to-orange-400"
+  }
+]
+
+const testimonials = [
+  { name: "Ceazar R.", comment: "The courts are top-notch and the staff is incredibly friendly. Best pickle ball experience in GenSan!" },
+  { name: "Larry P.", comment: "I've improved my game so much thanks to the coaching here. Highly recommend for players of all levels." },
+  { name: "Kristian Q.", comment: "The extended hours are fantastic. I can come after work and still get a great game in." },
+  { name: "Maria S.", comment: "The community here is amazing. I've made so many new friends through pickle ball at this facility." },
+  { name: "David L.", comment: "State-of-the-art courts and equipment. It's a pleasure to play here every time." }
+]
 
 export default function EnhancedHomePage() {
   const [activeFeature, setActiveFeature] = useState(0)
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const router = useRouter();
-
-  const features = [
-    { 
-      title: "State-of-the-art Courts", 
-      description: "4 professional-grade courts with premium surfaces for optimal play.",
-      icon: <MapPin className="h-8 w-8" />,
-      image: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5"
-    },
-    { 
-      title: "Extended Hours", 
-      description: "Fully lit courts for evening games and flexible playing times.",
-      icon: <Clock className="h-8 w-8" />,
-      image: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5"
-    },
-    { 
-      title: "Regular Tournaments", 
-      description: "Exciting tournaments and leagues for competitive play.",
-      icon: <Trophy className="h-8 w-8" />,
-      image: "https://utfs.io/f/pUvyWRtocgCVXkOFRZ4SQFwVzqytEldgvRNPo3K4W5XnAihe"
-    },
-    { 
-      title: "Lounge Area", 
-      description: "Comfortable space to relax and socialize between games.",
-      icon: <Coffee className="h-8 w-8" />,
-      image: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5"
-    }
-  ]
-
-  const carouselImages = [
-    {
-      src: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5",
-      title: "Christmas Sale! Up to 15% off on new members!", 
-      color: "bg-gradient-to-r from-red-600 to-red-400"
-    },
-    {
-      src: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5",
-      title: "New Year Special Membership",
-      color: "bg-gradient-to-r from-blue-600 to-blue-400"
-    },
-    {
-      src: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5",
-      title: "Weekend Tournament",
-      color: "bg-gradient-to-r from-green-600 to-green-400"
-    },
-    {
-      src: "https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5",
-      title: "Summer Camp Registration Open",
-      color: "bg-gradient-to-r from-orange-600 to-orange-400"
-    }
-  ]
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % carouselImages.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  })
+  const router = useRouter()
 
   const mapOptions = useMemo((): google.maps.MapOptions => ({
     disableDefaultUI: false,
@@ -98,45 +101,14 @@ export default function EnhancedHomePage() {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <HeaderFrontPage />
       <main className="flex-grow">
-        {/* Hero Section with Banner Carousel */}
-        <section className="relative w-full h-[600px] overflow-hidden">
-          <div className="relative w-full h-full">
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={currentSlide}
-                className={`absolute inset-0 w-full h-full ${carouselImages[currentSlide].color} flex items-center justify-center`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <h2 className="text-4xl md:text-6xl font-bold text-white text-center px-4 drop-shadow-lg">
-                  {carouselImages[currentSlide].title}
-                </h2>
-              </motion.div>
-            </AnimatePresence>
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {carouselImages.map((_, index) => (
-                <button
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    currentSlide === index ? 'bg-white scale-125' : 'bg-white/50'
-                  }`}
-                  onClick={() => setCurrentSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
+        <HeroCarousel images={carouselImages} />
 
-        {/* Main Content Section with Google Maps */}
         <section className="relative w-full py-16 md:py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid gap-12 items-center lg:grid-cols-2">
               <div className="flex flex-col space-y-6">
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-gray-900">
-                  Elevate your game at <span className="text-blue-600">General Santos Business Park</span> Pickle Ball Court
+                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">
+                  Elevate Your Game at General Santos Business Park Pickle Ball Court
                 </h1>
                 <p className="max-w-[700px] text-gray-600 md:text-xl">
                   Experience the fastest-growing sport in our state-of-the-art facility. Join the pickle ball revolution today!
@@ -174,34 +146,18 @@ export default function EnhancedHomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
         <section id="features" className="w-full py-24 bg-gradient-to-b from-white to-blue-50">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">World-Class Facilities</h2>
             <div className="flex flex-col lg:flex-row gap-12 items-center">
               <div className="w-full lg:w-1/2 space-y-6">
                 {features.map((feature, index) => (
-                  <motion.div
+                  <FeatureCard
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <Card 
-                      className={`transition-all cursor-pointer hover:shadow-lg ${activeFeature === index ? 'border-blue-600 bg-blue-50' : ''}`}
-                      onClick={() => setActiveFeature(index)}
-                    >
-                      <CardContent className="flex items-center p-6">
-                        <div className={`mr-4 p-3 rounded-full ${activeFeature === index ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-600'}`}>
-                          {feature.icon}
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                          <p className="text-gray-600">{feature.description}</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
+                    feature={feature}
+                    isActive={activeFeature === index}
+                    onClick={() => setActiveFeature(index)}
+                  />
                 ))}
               </div>
               <div className="w-full lg:w-1/2">
@@ -229,7 +185,6 @@ export default function EnhancedHomePage() {
           </div>
         </section>
 
-        {/* About Section */}
         <section id="about" className="w-full py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid gap-12 lg:grid-cols-2 items-center">
@@ -245,7 +200,7 @@ export default function EnhancedHomePage() {
               </div>
               <div className="flex items-center justify-center">
                 <Image
-                  src="https://utfs.io/f/pUvyWRtocgCVkHMrpJEt8yXxrNnMQVYoa1gqAFZUHRd9SKG5"
+                  src="/images/about-pickleball.jpg"
                   alt="Pickle Ball Court"
                   width={600}
                   height={400}
@@ -256,37 +211,13 @@ export default function EnhancedHomePage() {
           </div>
         </section>
 
-        {/* Testimonials Section */}
         <section className="w-full py-24 bg-gray-50">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">What Our Players Say</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { name: "Ceazar R.", comment: "The courts are top-notch and the staff is incredibly friendly. Best pickle ball experience in GenSan!" },
-                { name: "Larry P.", comment: "I've improved my game so much thanks to the coaching here. Highly recommend for players of all levels." },
-                { name: "Kristian Q.", comment: "The extended hours are fantastic. I can come after work and still get a great game in." }
-              ].map((testimonial, index) => (
-                <Card key={index} className="transition-all hover:shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-gray-900">{testimonial.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="italic text-gray-600">&quot;{testimonial.comment}&quot;</p>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
+            <TestimonialCarousel testimonials={testimonials} />
           </div>
         </section>
 
-        {/* Membership Section */}
         <section id="membership" className="w-full py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">Annual Membership</h2>
@@ -318,34 +249,11 @@ export default function EnhancedHomePage() {
           </div>
         </section>
 
-        {/* Contact Section */}
         <section id="contact" className="w-full py-24 bg-gray-50">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">Get in Touch</h2>
             <div className="grid gap-12 lg:grid-cols-2">
-              <div>
-                <form className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label htmlFor="first-name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">First name</label>
-                      <Input id="first-name" placeholder="Enter your first name" className="w-full" />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="last-name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Last name</label>
-                      <Input id="last-name" placeholder="Enter your last name" className="w-full" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</label>
-                    <Input id="email" placeholder="Enter your email" type="email" className="w-full" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Message</label>
-                    <Textarea id="message" placeholder="Enter your message" className="w-full" />
-                  </div>
-                  <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300">Send Message</Button>
-                </form>
-              </div>
+              <ContactForm />
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -374,8 +282,7 @@ export default function EnhancedHomePage() {
         </section>
       </main>
 
-     <Footer />
+      <Footer />
     </div>
   )
 }
-
