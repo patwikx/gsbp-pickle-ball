@@ -74,9 +74,8 @@ export const RegistrationConfirmationEmail: React.FC<RegistrationConfirmationEma
                         <td style={{ padding: '20px' }}>
                           <h3 style={{ color: '#1e40af', fontSize: '18px', fontWeight: 600, margin: '0 0 15px' }}>Next Steps</h3>
                           <ol style={{ margin: '0', paddingLeft: '20px', color: '#475569' }}>
-                          <li style={{ marginBottom: '10px' }}>Go to the RD Realty Development Corporation office cashier.</li>
-                          <li style={{ marginBottom: '10px' }}>Present your registration ID and your name to the cashier.</li>
-                          <li style={{ marginBottom: '10px' }}>Pay the account activation fee of 1000 PHP.</li>
+                          <li style={{ marginBottom: '10px' }}>An email has been sent to your registered email address with the registration ID and your name.</li>
+                          <li style={{ marginBottom: '10px' }}>Pay the account activation fee of 1000 PHP. (see Payment Options on the email sent.)</li>
                           <li style={{ marginBottom: '10px' }}>Your account will be activated after payment confirmation.</li>
                             <li style={{ marginBottom: '10px' }}>Log in to your account using your registered email and password.</li>
                             <li style={{ marginBottom: '10px' }}>Complete your profile by adding any additional required information.</li>
