@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useCallback, useTransition } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useCallback } from 'react'
 import {
   Table,
   TableBody,
@@ -26,7 +25,6 @@ import { RegisterForm } from '@/components/auth/register-form'
 import { UserDialogs } from './users-dialog'
 import { UserActions } from './user-actions'
 
-
 export const revalidate = 0
 
 export function UserList({ initialUsers, totalUsers }: UserListProps) {
@@ -37,31 +35,28 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isEditUserOpen, setIsEditUserOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isPending, startTransition] = useTransition()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const page = parseInt(searchParams.get('page') || '1', 10)
-  const pageSize = 10
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  })
   const { toast } = useToast()
 
-  const filteredUsers = users.filter(user => 
-    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.id?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
 
-  const paginatedUsers = filteredUsers.slice((page - 1) * pageSize, page * pageSize)
-  const totalPages = Math.ceil(totalUsers / pageSize)
+
+  const paginatedUsers = users.slice(
+    pagination.pageIndex * pagination.pageSize,
+    (pagination.pageIndex + 1) * pagination.pageSize
+  )
+  const totalPages = Math.ceil(users.length / pagination.pageSize)
 
   const handleSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }, [])
 
   const handlePageChange = useCallback((newPage: number) => {
-    startTransition(() => {
-      router.push(`/user-management?page=${newPage}`)
-    })
-  }, [router])
+    setPagination(prev => ({ ...prev, pageIndex: newPage }))
+  }, [])
 
   const handleChangePassword = useCallback(async (password: string) => {
     if (!selectedUser) return
@@ -116,7 +111,6 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
     }
   }, [selectedUser, toast])
 
-
   const handleUpdateUserStatus = useCallback(async (userId: string, status: boolean) => {
     try {
       const result = await updateUser(userId, { emailVerified: status })
@@ -165,9 +159,6 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
               <Badge variant="outline" className="text-xs">
                 Total Users: {totalUsers}
               </Badge>
-              <Badge variant="outline" className="text-xs">
-                Filtered: {filteredUsers.length}
-              </Badge>
             </div>
           </div>
 
@@ -190,8 +181,8 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isPending ? (
-                  <UserTableSkeleton count={pageSize} />
+                {isProcessing ? (
+                  <UserTableSkeleton count={pagination.pageSize} />
                 ) : (
                   paginatedUsers.map((user) => (
                     <TableRow 
@@ -231,20 +222,20 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                         />
                       </TableCell>
                       <TableCell className='text-center'>
-              {user.proofPayment && user.proofPayment !== 'about:blank' ? (
-                <a
-                  href={user.proofPayment}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800"
-                >
-                  <ExternalLink className="h-4 w-4 mr-1" />
-                  View
-                </a>
-              ) : (
-                'N/A'
-              )}
-            </TableCell>
+                        {user.proofPayment && user.proofPayment !== 'about:blank' ? (
+                          <a
+                            href={user.proofPayment}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            View
+                          </a>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <UserActions       
                           user={user}
@@ -262,7 +253,7 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                           }}
                           onViewPayments={(user) => {
                             setSelectedUser(user)
-                            
+                            // Add logic for viewing payments if needed
                           }}
                         />
                       </TableCell>
@@ -275,14 +266,14 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, totalUsers)} of {totalUsers} users
+              Showing {(pagination.pageIndex * pagination.pageSize) + 1} to {Math.min((pagination.pageIndex + 1) * pagination.pageSize, users.length)} of {users.length} users
             </p>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1 || isPending}
+                onClick={() => handlePageChange(pagination.pageIndex - 1)}
+                disabled={pagination.pageIndex === 0 || isProcessing}
               >
                 <ChevronLeft className="h-4 w-4 mr-2" />
                 Previous
@@ -291,10 +282,10 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                   <Button
                     key={pageNum}
-                    variant={pageNum === page ? "default" : "outline"}
+                    variant={pageNum === pagination.pageIndex + 1 ? "default" : "outline"}
                     size="sm"
-                    onClick={() => handlePageChange(pageNum)}
-                    disabled={isPending}
+                    onClick={() => handlePageChange(pageNum - 1)}
+                    disabled={isProcessing}
                     className="w-8"
                   >
                     {pageNum}
@@ -304,8 +295,8 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handlePageChange(page + 1)}
-                disabled={page === totalPages || isPending}
+                onClick={() => handlePageChange(pagination.pageIndex + 1)}
+                disabled={pagination.pageIndex === totalPages - 1 || isProcessing}
               >
                 Next
                 <ChevronRight className="h-4 w-4 ml-2" />
@@ -330,3 +321,4 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
     </Card>
   )
 }
+

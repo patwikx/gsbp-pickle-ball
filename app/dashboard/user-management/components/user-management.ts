@@ -5,7 +5,7 @@ import { prismadb } from "@/lib/db"
 import { hash } from "bcryptjs"
 import { revalidatePath } from "next/cache"
 
-export async function getUsers(page = 1, pageSize = 10) {
+export async function getUsers() {
   try {
     const users = await prismadb.user.findMany({
       select: {
@@ -21,8 +21,8 @@ export async function getUsers(page = 1, pageSize = 10) {
         emailVerified: true,
         proofPayment: true,
       },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      orderBy: { createdAt: 'desc' },
+    
     })
 
     const totalUsers = await prismadb.user.count()
