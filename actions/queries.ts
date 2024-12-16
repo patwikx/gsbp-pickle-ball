@@ -11,6 +11,7 @@ import { prismadb } from "@/lib/db";
 import { getCurrentUser } from "@/hooks/use-current-user";
 import { revalidatePath } from "next/cache";
 import { sendRegistrationEmail } from "./send-registration-email";
+import { sendNewRegistrationNotification } from "./registration-email-notif";
 
 
 
@@ -170,6 +171,16 @@ import { sendRegistrationEmail } from "./send-registration-email";
         name,
         registrationId: newUser.id,
       });
+
+      //send registration notification to admin
+        // Send registration confirmation email
+        sendNewRegistrationNotification({
+          contactNo: contactNo ?? null,
+          address: address ?? null,
+          email,
+          name,
+          memberId: newUser.id,
+        });
   
       revalidatePath('/dashboard/user-management');
       return { success: "User registered successfully!", registrationId: newUser.id };
