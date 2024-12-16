@@ -111,15 +111,67 @@ export async function sendRegistrationEmail(params: {
                           <td style="padding: 20px;">
                             <h3 style="color: #1e40af; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Next Steps</h3>
                             <ol style="margin: 0; padding-left: 20px; color: #475569;">
-                          <li style={{ marginBottom: '10px' }}>Go to the RD Realty Development Corporation office cashier.</li>
-                          <li style={{ marginBottom: '10px' }}>Present your registration ID and your name to the cashier.</li>
-                          <li style={{ marginBottom: '10px' }}>Pay the account activation fee of 1000 PHP.</li>
-                          <li style={{ marginBottom: '10px' }}>Your account will be activated after payment confirmation.</li>
-                            <li style={{ marginBottom: '10px' }}>Log in to your account using your registered email and password.</li>
-                            <li style={{ marginBottom: '10px' }}>Complete your profile by adding any additional required information.</li>
-                            <li style={{ marginBottom: '10px' }}>Familiarize yourself with our booking system and court guidelines.</li>
-                            <li style={{ marginBottom: '10px' }}>Start booking your preferred pickleball court slots!</li>
+                              <li style="margin-bottom: 10px;">Choose your preferred payment method (see Payment Options below).</li>
+                              <li style="margin-bottom: 10px;">Pay the account activation fee of 1000 PHP.</li>
+                              <li style="margin-bottom: 10px;">Your account will be activated after payment confirmation.</li>
+                              <li style="margin-bottom: 10px;">Log in to your account using your registered email and password.</li>
+                              <li style="margin-bottom: 10px;">Complete your profile by adding any additional required information.</li>
+                              <li style="margin-bottom: 10px;">Familiarize yourself with our booking system and court guidelines.</li>
+                              <li style="margin-bottom: 10px;">Start booking your preferred pickleball court slots!</li>
                             </ol>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- Payment Options -->
+                      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 8px; overflow: hidden; margin-bottom: 30px;">
+                        <tr>
+                          <td style="padding: 20px;">
+                            <h3 style="color: #1e40af; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Payment Options</h3>
+                            
+                            <!-- Office Payment -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                              <tr>
+                                <td style="padding: 15px; background-color: #ffffff; border-radius: 8px;">
+                                  <h4 style="color: #1e40af; font-size: 16px; font-weight: 600; margin: 0 0 10px;">Office Payment</h4>
+                                  <p style="margin: 0 0 5px;">Pay at our office cashier:</p>
+                                  <p style="margin: 0 0 5px;"><strong>RD REALTY DEVELOPMENT CORPORATION</strong></p>
+                                  <p style="margin: 0 0 5px;">General Santos Business Park, National Highway</p>
+                                  <p style="margin: 0;">General Santos City, Philippines</p>
+                                </td>
+                              </tr>
+                            </table>
+
+                            <!-- Fund Transfer -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                              <tr>
+                                <td style="padding: 15px; background-color: #ffffff; border-radius: 8px;">
+                                  <h4 style="color: #1e40af; font-size: 16px; font-weight: 600; margin: 0 0 10px;">Fund Transfer</h4>
+                                  
+                                  <!-- BPI Account -->
+                                  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 15px;">
+                                    <tr>
+                                      <td>
+                                        <img src="https://utfs.io/f/pUvyWRtocgCVCbT7HilK38AKlBqGNT7RI5pYizjQHwtvsrfV" alt="BPI Logo" width="60" height="25" style="display: block; margin-bottom: 10px;">
+                                        <p style="margin: 0 0 5px;"><strong>Account Name:</strong> RD REALTY DEVELOPMENT CORPORATION</p>
+                                        <p style="margin: 0;"><strong>Account Number:</strong> 2150-0024-11</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+
+                                  <!-- Security Bank Account -->
+                                  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                      <td>
+                                        <img src="https://utfs.io/f/pUvyWRtocgCVc3B7N69o4LvgUGbQwfjl5t3FziTsKSZAda90" alt="Security Bank Logo" width="125" height="50" style="display: block; margin-bottom: 10px;">
+                                        <p style="margin: 0 0 5px;"><strong>Account Name:</strong> RD REALTY DEVELOPMENT CORPORATION</p>
+                                        <p style="margin: 0;"><strong>Account Number:</strong> 411-014382-001</p>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
                           </td>
                         </tr>
                       </table>
@@ -128,10 +180,10 @@ export async function sendRegistrationEmail(params: {
                       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #e0f2fe; border-radius: 8px; overflow: hidden;">
                         <tr>
                           <td style="padding: 20px;">
-                            <h3 style="color: #1e40af; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Contact Information</h3>
+                            <h3 style="color: #1e40af; font-size: 18px; font-weight: 600; margin: 0 0 15px;">Need help with payment?</h3>
                             <p style="margin: 0 0 10px;">For any questions or concerns, please contact GSBPPBC:</p>
-                            <p style="margin: 0 0 5px;">Email: <a href="mailto:pmd.associate@rdretailgroup.com.ph" style="color: #2563eb; text-decoration: none;">pmd.associate@rdretailgroup.com.ph</a></p>
-                            <p style="margin: 0;">Phone: <a href="tel:+639992202427" style="color: #2563eb; text-decoration: none;">+63 999 220 2427</a></p>
+                            <p style="margin: 0 0 5px;">Phone: <a href="tel:+639992202427" style="color: #2563eb; text-decoration: none;">+63 999 220 2427</a></p>
+                            <p style="margin: 0;">Email: <a href="mailto:pmd.associate@rdretailgroup.com.ph" style="color: #2563eb; text-decoration: none;">pmd.associate@rdretailgroup.com.ph</a></p>
                           </td>
                         </tr>
                       </table>
