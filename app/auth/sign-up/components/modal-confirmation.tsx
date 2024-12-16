@@ -64,17 +64,20 @@ export default function ConfirmationModal({ isOpen, onClose, registrationId }: C
 
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Thank you for registering. Your account has been created, but your membership is currently pending. 
-                  Please note down your Registration ID and present this to the front desk for account activation upon successful payment.
+                  Thank you for registering. Your account has been created, but your membership is currently pending.
                 </p>
 
                 <div>
-                  <p className="font-semibold mb-3">Next steps:</p>
-                  <ol className="list-decimal list-inside space-y-2 text-sm">
-                    <li className="pl-2">Visit our office cashier</li>
-                    <li className="pl-2">Pay the account activation fee of 1000 PHP</li>
-                    <li className="pl-2">Your account will be activated after payment confirmation</li>
-                  </ol>
+                  <table border={0} cellPadding="0" cellSpacing="0" width="100%" style={{ backgroundColor: '#f8fafc', borderRadius: '8px', overflow: 'hidden', marginBottom: '15px' }}>
+
+                        <td style={{ padding: '15px' }}>
+                          <h3 style={{ color: '#1e40af', fontSize: '18px', fontWeight: 600, margin: '0 0 15px' }}>Next Steps</h3>
+                          <ol style={{ margin: '0', paddingLeft: '20px', color: '#475569' }}>
+                          <li className="text-sm" style={{ marginBottom: '10px' }}>An email has been sent to your registered email address with the registration ID and your name.</li>
+                          <li className="text-sm" style={{ marginBottom: '10px' }}>Pay the account activation fee of 1000 PHP. (see Payment Options on the email sent.)</li>
+                          </ol>
+                        </td>
+                    </table>
                 </div>
               </div>
             </CardContent>
@@ -85,7 +88,7 @@ export default function ConfirmationModal({ isOpen, onClose, registrationId }: C
           </div>
         </div>
 
-        <CardFooter className="flex justify-between gap-4 px-0 pt-4">
+        <CardFooter className="flex justify-between gap-4 px-0">
           <Button 
             onClick={saveAsImage} 
             variant="outline" 
