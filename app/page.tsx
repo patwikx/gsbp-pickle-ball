@@ -69,22 +69,22 @@ const funFacts = [
 
 const propertyImages = [
   {
-    url: "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
-    title: "Premium Court 1",
-    description: "Professional-grade indoor court with climate control",
-    features: ["Climate Controlled", "Professional Lighting", "Premium Flooring"]
+    url: "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVrQ152PpuOasyUGgBmjXo3zxvSV4LElJHIM58",
+    title: "General Santos Business Park",
+    description: "Commercial Spaces prime for your businesses",
+    features: ["Parking", "24/7 Security equipped with CCTV Cameras", "In the heart of General Santos City"]
   },
   {
-    url: "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp",
-    title: "Outdoor Complex",
-    description: "Beautiful outdoor courts with perfect lighting",
-    features: ["UV Protection", "Night Lighting", "Tournament Ready"]
+    url: "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVSFS1kKPxQ8AsDOWnbNTajmwkgGJrKeCXdIfB",
+    title: "General Santos Business Park",
+    description: "Commercial Spaces prime for your businesses",
+    features: ["Parking", "24/7 Security equipped with CCTV Cameras", "In the heart of General Santos City"]
   },
   {
-    url: "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp",
-    title: "Tournament Arena",
-    description: "Championship court with spectator seating",
-    features: ["Spectator Seating", "Pro Equipment", "Event Space"]
+    url: "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVhVBTeBL6dURkCuz3sloM2OqFTWgGJyQ01485",
+    title: "General Santos Business Park",
+    description: "Commercial Spaces prime for your businesses",
+    features: ["Parking", "24/7 Security equipped with CCTV Cameras", "In the heart of General Santos City"]
   }
 ]
 
@@ -107,8 +107,9 @@ export default function HomePage() {
   
   const images = [
     "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
-    "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp",
-    "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp"
+    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVrQ152PpuOasyUGgBmjXo3zxvSV4LElJHIM58",
+    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVSFS1kKPxQ8AsDOWnbNTajmwkgGJrKeCXdIfB",
+    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVhVBTeBL6dURkCuz3sloM2OqFTWgGJyQ01485"
   ]
 
   const mapOptions = useMemo((): google.maps.MapOptions => ({
