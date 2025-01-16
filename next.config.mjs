@@ -3,7 +3,8 @@ const nextConfig = {
     images: {
         domains: [
             "res.cloudinary.com",
-            "utfs.io"
+            "utfs.io",
+            "4b9moeer4y.ufs.sh"
         ]
     }
 };
