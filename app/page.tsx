@@ -99,11 +99,8 @@ const center = {
 }
 
 export default function HomePage() {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [nextImageIndex, setNextImageIndex] = useState(1)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
   const [propertyIndex, setPropertyIndex] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   
   const images = [
     "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
@@ -119,79 +116,53 @@ export default function HomePage() {
   }), [])
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setIsTransitioning(true)
-      setNextImageIndex((currentImageIndex + 1) % images.length)
-      
-      setTimeout(() => {
-        setCurrentImageIndex(nextImageIndex)
-        setIsTransitioning(false)
-      }, 1000)
-    }, 3000)
-
-    return () => clearInterval(intervalId)
-  }, [currentImageIndex, nextImageIndex, images.length])
-
-  useEffect(() => {
-    const autoPlayInterval = setInterval(() => {
-      if (isAutoPlaying) {
-        setPropertyIndex((prev) => (prev + 1) % propertyImages.length)
-      }
+    const timer = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % images.length)
     }, 5000)
 
-    return () => clearInterval(autoPlayInterval)
-  }, [isAutoPlaying])
+    return () => clearInterval(timer)
+  }, [images.length])
 
   const nextProperty = () => {
-    setIsAutoPlaying(false)
     setPropertyIndex((prev) => (prev + 1) % propertyImages.length)
   }
 
   const prevProperty = () => {
-    setIsAutoPlaying(false)
     setPropertyIndex((prev) => (prev - 1 + propertyImages.length) % propertyImages.length)
   }
 
   const router = useRouter()
 
   return (
-    
     <div className="min-h-screen bg-gray-50">
       <MainNav />
       
       {/* Hero Section */}
       <section className="relative h-[90vh] overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="relative h-full">
-            <motion.div 
-              className="absolute inset-0"
-              animate={{ scale: 1.05 }}
-              transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
-            >
-              <Image
-                src={images[currentImageIndex]}
-                alt="Pickleball Court"
-                fill
-                className="object-cover transition-opacity duration-1000"
-                priority
-              />
-            </motion.div>
-            <motion.div 
-              className="absolute inset-0"
-              animate={{ scale: 1.05 }}
-              transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
-            >
-              <Image
-                src={images[nextImageIndex]}
-                alt="Pickleball Court"
-                fill
-                className={`object-cover transition-opacity duration-1000 ${isTransitioning ? 'opacity-100' : 'opacity-0'}`}
-                priority
-              />
-            </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
-          </div>
-        </div>
+        {images.map((image, index) => (
+          <motion.div
+            key={index}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: activeIndex === index ? 1 : 0,
+              scale: 1.05
+            }}
+            transition={{ 
+              opacity: { duration: 1 },
+              scale: { duration: 20, repeat: Infinity, repeatType: "reverse" }
+            }}
+          >
+            <Image
+              src={image}
+              alt="Pickleball Court"
+              fill
+              className="object-cover"
+              priority
+            />
+          </motion.div>
+        ))}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
         
         <div className="relative h-full container mx-auto px-4 flex items-center">
           <div className="max-w-2xl space-y-6">
@@ -294,20 +265,13 @@ export default function HomePage() {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Premium Facilities</h2>
-          <div className="relative max-w-4xl mx-auto">
-            <motion.div
-              key={propertyIndex}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.5 }}
-              className="relative h-[500px] rounded-xl overflow-hidden shadow-2xl"
-            >
+          <div className="relative max-w-6xl mx-auto">
+            <div className="relative h-[600px] rounded-xl overflow-hidden shadow-2xl">
               <Image
                 src={propertyImages[propertyIndex].url}
                 alt={propertyImages[propertyIndex].title}
                 fill
-                className="object-cover"
+                className="object-cover transition-all duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -328,22 +292,20 @@ export default function HomePage() {
                   ))}
                 </div>
               </div>
-            </motion.div>
-            
-            <div className="absolute left-4 right-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none">
-              <button
-                onClick={prevProperty}
-                className="pointer-events-auto transform hover:scale-110 transition-all duration-300 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg text-gray-800"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={nextProperty}
-                className="pointer-events-auto transform hover:scale-110 transition-all duration-300 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg text-gray-800"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
             </div>
+            
+            <button
+              onClick={prevProperty}
+              className="absolute left-4 top-1/2 -translate-y-1/2 transform hover:scale-110 transition-all duration-300 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg text-gray-800"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={nextProperty}
+              className="absolute right-4 top-1/2 -translate-y-1/2 transform hover:scale-110 transition-all duration-300 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg text-gray-800"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
           </div>
         </div>
       </section>
