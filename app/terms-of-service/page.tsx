@@ -4,17 +4,18 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { HeaderFrontPage } from '@/components/front-page-header'
-import { ChevronUp, Home } from 'lucide-react'
+import { ChevronUp, Home, Menu } from 'lucide-react'
 import { Footer } from '@/components/footer'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { cn } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
+import { MainNav } from '@/components/front-page-header'
 
-// Interface for defining the structure of each section
 interface Section {
   id: string;
   title: string;
 }
 
-// Array of sections with their corresponding IDs and titles
 const sections: Section[] = [
   { id: 'acceptance', title: 'Acceptance of Terms' },
   { id: 'changes', title: 'Changes to Terms' },
@@ -35,132 +36,229 @@ const sections: Section[] = [
 export default function TermsOfService() {
   const [activeSection, setActiveSection] = useState<string>('');
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [pendingScroll, setPendingScroll] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;
       const fullHeight = document.documentElement.scrollHeight;
+      
       setScrollProgress((scrollPosition / (fullHeight - windowHeight)) * 100);
+      setShowScrollTop(scrollPosition > windowHeight * 0.5);
 
-      const sectionElements = sections.map(section => 
-        document.getElementById(section.id)
+      // Improved section detection with Intersection Observer
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(entry.target.id);
+            }
+          });
+        },
+        {
+          rootMargin: '-20% 0px -80% 0px',
+        }
       );
 
-      const currentSection = sectionElements.findIndex(el => 
-        el && el.offsetTop <= scrollPosition + 200 
-      );
+      sections.forEach((section) => {
+        const element = document.getElementById(section.id);
+        if (element) observer.observe(element);
+      });
 
-      if (currentSection !== -1) {
-        setActiveSection(sections[currentSection].id);
-      }
+      return () => observer.disconnect();
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle sheet close and perform scroll
+  useEffect(() => {
+    if (!sheetOpen && pendingScroll) {
+      const element = document.getElementById(pendingScroll);
+      if (element) {
+        const offset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        setTimeout(() => {
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+          setPendingScroll(null);
+        }, 150);
+      }
+    }
+  }, [sheetOpen, pendingScroll]);
+
+  const scrollToSection = (sectionId: string) => {
+    setPendingScroll(sectionId);
+    setSheetOpen(false);
+  };
+
+  const TableOfContents = () => (
+    <nav className="space-y-1">
+      {sections.map((section) => (
+        <button
+          key={section.id}
+          onClick={() => scrollToSection(section.id)}
+          className={cn(
+            "w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200",
+            "hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary/20",
+            activeSection === section.id
+              ? "bg-primary text-primary-foreground font-medium"
+              : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          {section.title}
+        </button>
+      ))}
+    </nav>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200 z-50">
-        <div 
-          className="h-full bg-primary transition-all duration-300 ease-out"
-          style={{ width: `${scrollProgress}%` }}
-        ></div>
+        <motion.div 
+          className="h-full bg-primary"
+          initial={{ width: 0 }}
+          animate={{ width: `${scrollProgress}%` }}
+          transition={{ duration: 0.1 }}
+        />
       </div>
 
-      <HeaderFrontPage />
+      <MainNav />
 
-      <div className="container mx-auto px-4 py-8">
-        <nav className="text-sm mb-8 flex items-center space-x-2">
-          <Link href="/" className="text-primary hover:underline flex items-center">
-            <Home className="w-4 h-4 mr-1" />
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Breadcrumb */}
+        <nav className="text-sm mb-8 flex items-center space-x-2 animate-fade-in">
+          <Link 
+            href="/" 
+            className="text-primary hover:text-primary/80 transition-colors flex items-center group"
+          >
+            <Home className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
             Home
           </Link>
-          <span>/</span>
+          <span className="text-muted-foreground">/</span>
           <span className="text-muted-foreground">Terms of Service</span>
         </nav>
 
-        <h1 className="text-4xl font-bold mb-8">Terms of Service</h1>
+        {/* Title Section */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+            Terms of Service
+          </h1>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardContent className="p-8">
+              <p className="text-sm text-muted-foreground">Last Updated: December 10, 2024</p>
+              <p className="mt-4 leading-relaxed">
+                Welcome to the General Santos Business Park Pickleball Court booking system. 
+                These Terms of Service (&quot;Terms&quot;) govern your use of our website and services. 
+                Please read these Terms carefully before using our service.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card className="mb-8 shadow-lg">
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground">Last Updated: December 10, 2024</p>
-            <p className="mt-4">
-              Welcome to the General Santos Business Park Pickle Ball Court booking system. 
-              These Terms of Service (&quot;Terms&quot;) govern your use of our website and services. 
-              Please read these Terms carefully before using our service.
-            </p>
-          </CardContent>
-        </Card>
+        {/* Mobile Table of Contents */}
+        <div className="lg:hidden mb-8">
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full flex items-center justify-between">
+                <span>Table of Contents</span>
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <div className="py-4">
+                <h2 className="text-lg font-semibold mb-4">Table of Contents</h2>
+                <TableOfContents />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
 
+        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <Card className="lg:col-span-1 h-fit sticky top-20">
+          {/* Desktop Table of Contents */}
+          <Card className="hidden lg:block h-fit sticky top-20 shadow-md">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Table of Contents</h2>
-              <nav>
-                <ul className="space-y-2">
-                  {sections.map((section) => (
-                    <li key={section.id}>
-                      <Link 
-                        href={`#${section.id}`} 
-                        className={`block p-2 rounded-md transition-colors ${
-                          activeSection === section.id
-                            ? 'bg-primary text-primary-foreground' 
-                            : 'text-muted-foreground hover:bg-muted'
-                        }`}
-                      >
-                        {section.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+              <TableOfContents />
             </CardContent>
           </Card>
 
-          <div className="lg:col-span-3 space-y-8">
+          {/* Content Sections */}
+          <div className="lg:col-span-3 space-y-12">
             {sections.map((section) => (
-              <section key={section.id} id={section.id}>
-                <h2 className="text-2xl font-semibold mb-4">
-                  {section.title}
+              <motion.section
+                key={section.id}
+                id={section.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <h2 className="text-2xl font-semibold mb-4 flex items-center space-x-2">
+                  <span>{section.title}</span>
                 </h2>
-                <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
+                <Card className="shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary">
+                  <CardContent className="p-8">
                     {renderSectionContent(section.id)}
                   </CardContent>
                 </Card>
-              </section>
+              </motion.section>
             ))}
           </div>
         </div>
 
-        <div className="mt-12 text-center">
-          <Button asChild>
-            <Link href="/">Back to Home</Link>
+        {/* Back to Home Button */}
+        <div className="mt-16 text-center">
+          <Button asChild size="lg" className="animate-fade-in">
+            <Link href="/">Return to Home</Link>
           </Button>
         </div>
-      </div>
+      </main>
 
       <Footer />
 
-      <Button
-        className="fixed bottom-4 right-4 rounded-full p-2"
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      >
-        <ChevronUp className="h-6 w-6" />
-      </Button>
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed bottom-8 right-8 z-50"
+          >
+            <Button
+              size="lg"
+              className="rounded-full shadow-lg hover:shadow-xl p-3"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <ChevronUp className="h-6 w-6" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 // Function to render content for each section based on sectionId
 function renderSectionContent(sectionId: string): JSX.Element {
+  // ... rest of the renderSectionContent function remains exactly the same ...
   switch (sectionId) {
     case 'acceptance':
       return (
         <p>
-          By accessing or using the General Santos Business Park Pickle Ball Court booking system, 
+          By accessing or using the General Santos Business Park Pickleball Court booking system, 
           you agree to be bound by these Terms of Service. If you disagree with any part of the terms, 
           you may not access the service.
         </p>
@@ -345,4 +443,3 @@ function renderSectionContent(sectionId: string): JSX.Element {
       return <p>Content for this section is not available.</p>
   }
 }
-

@@ -297,7 +297,7 @@ export function Header() {
           <Link href="/dashboard" className="flex items-center space-x-3">
             <Image src="/rdrdc.webp" alt="Logo" width={32} height={32} />
             <span className="hidden font-bold sm:inline-block">
-              GSBP Pickle Ball Court
+              GSBP Pickleball Court
             </span>
           </Link>
           <MainNav />

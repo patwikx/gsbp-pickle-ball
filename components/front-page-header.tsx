@@ -1,154 +1,86 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from 'next/navigation'
-import { Menu, X, Home, Info, DollarSign, Mail, LogIn } from 'lucide-react'
+import {  LogIn } from 'lucide-react'
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
-export function HeaderFrontPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+export function MainNav() {
+  const [isScrolled, setIsScrolled] = useState(false)
   const router = useRouter()
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  // Handle scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
 
-  const navItems = [
-    { name: 'Home', icon: Home },
-    { name: 'About', icon: Info },
-    { name: 'Pricing', icon: DollarSign },
-    { name: 'Contact', icon: Mail }
-  ]
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <div className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        {/* Menu Button (Mobile) */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-            >
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            {navItems.map((item) => (
-              <DropdownMenuItem key={item.name} asChild>
-                <Link 
-                  href={`#${item.name.toLowerCase()}`}
-                  className="flex w-full items-center"
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <header className={cn(
+      "sticky top-0 z-50 w-full transition-all duration-200",
+      isScrolled ? "bg-background/80 backdrop-blur-lg border-b shadow-sm" : "bg-background"
+    )}>
+      <div className="container mx-auto">
+        <div className="flex h-16 items-center justify-between">
+          {/* Mobile Menu */}
+        
 
-        {/* Logo and Brand */}
-        <div className="flex items-center justify-between flex-grow md:flex-grow-0">
-          <Link href="/" className="flex items-center gap-x-2 shrink-0">
-            <div className="relative aspect-square w-8 sm:w-10">
+          {/* Logo and Brand */}
+          <Link 
+            href="/" 
+            className="flex items-center gap-x-2 transition-opacity hover:opacity-90"
+          >
+            <div className="relative h-8 w-8 sm:h-10 sm:w-10">
               <Image
                 src="/rdrdc.webp"
                 alt="GSBP Pickle Ball Logo"
                 fill
-                sizes='(max-width: 640px) 32px, 40px'
-                className="object-contain rounded-full"
+                sizes="(max-width: 640px) 32px, 40px"
+                className="object-contain rounded-full ml-4"
                 priority
               />
             </div>
             <div className="hidden sm:flex flex-col items-start leading-none">
-              <span className="text-base font-bold">General Santos Business Park</span>
-              <span className="text-xs text-muted-foreground font-medium">Pickle Ball Court</span>
+              <span className="text-base font-bold ml-4">General Santos Business Park</span>
+              <span className="text-xs text-muted-foreground ml-4">Pickleball Court</span>
             </div>
-            <span className="font-semibold text-lg sm:hidden">GSBP Pickle Ball Court</span>
+            <span className="font-semibold text-lg sm:hidden ml-4">GSBP Pickleball Court</span>
           </Link>
 
-          {/* Login Button (Mobile) */}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex">
+            {/* Navigation items removed */}
+          </div>
+
+          {/* Auth Button */}
+          <Button
+            onClick={() => router.push('/auth/sign-in')}
+            className="hidden md:inline-flex"
+            variant="default"
+          >
+            <LogIn className="mr-2 h-4 w-4" />
+            Sign-in / Sign-up
+          </Button>
+
+          {/* Mobile Auth Button */}
           <Button
             onClick={() => router.push('/auth/sign-in')}
             size="sm"
-            className="md:hidden mr-2"
+            className="md:hidden mr-4"
+            variant="default"
           >
-            <LogIn className="mr-2 h-4 w-4" /> Login / Sign-up
-          </Button>
-        </div>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1 mr-16">
-          {navItems.map((item) => (
-            <Button
-              key={item.name}
-              variant="ghost"
-              asChild
-            >
-              <Link
-                href={`#${item.name.toLowerCase()}`}
-                className="inline-flex items-center"
-              >
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.name}
-              </Link>
-            </Button>
-          ))}
-        </nav>
-
-        {/* Actions (Desktop) */}
-        <div className="hidden md:flex items-center gap-x-4 shrink-0">
-          <Button
-            onClick={() => router.push('/auth/sign-in')}
-          >
-            <LogIn className="mr-2 h-4 w-4" /> Login / Sign-up
+            <LogIn className="mr-2 h-4 w-4" />
+            Sign-in / Sign-up
           </Button>
         </div>
       </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-background md:hidden">
-          <div className="flex h-16 items-center justify-between px-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <Image src="/rdrdc.webp" alt="Logo" width={40} height={40} className="rounded-full" />
-              <span className="font-bold text-xl text-primary">GSBP Pickle Ball</span>
-            </Link>
-            <Button variant="ghost" size="icon" onClick={toggleMenu}>
-              <X className="h-6 w-6" />
-              <span className="sr-only">Close menu</span>
-            </Button>
-          </div>
-          <nav className="grid gap-6 p-6">
-            {navItems.map((item) => (
-              <Button
-                key={item.name}
-                variant="ghost"
-                className="justify-start"
-                asChild
-              >
-                <Link
-                  href={`#${item.name.toLowerCase()}`}
-                  onClick={toggleMenu}
-                >
-                  <item.icon className="mr-2 h-5 w-5" />
-                  {item.name}
-                </Link>
-              </Button>
-            ))}
-          </nav>
-        </div>
-      )}
-    </div>
+    </header>
   )
 }
-

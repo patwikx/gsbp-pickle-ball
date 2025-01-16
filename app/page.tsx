@@ -1,20 +1,92 @@
 'use client'
 
-import { useState,  useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { ArrowRight, Calendar, Users, Trophy, Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
-import { ArrowRight, Check, Clock, MapPin, Phone, Mail, Trophy, Coffee } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { HeaderFrontPage } from '@/components/front-page-header'
+import { Card, CardContent } from "@/components/ui/card"
+import { MainNav } from '@/components/front-page-header'
 import { Footer } from '@/components/footer'
-import { HeroCarousel } from '@/components/hero-carousel'
-import { FeatureCard } from '@/components/feature-card'
-import { TestimonialCarousel } from '@/components/testimonial-card'
-import { ContactForm } from '@/components/contact-form'
+import { useRouter } from 'next/navigation'
+
+const features = [
+  {
+    title: "Book Courts",
+    description: "Reserve your court time easily through our online booking system",
+    icon: Calendar,
+    color: "bg-blue-500"
+  },
+  {
+    title: "Join Community",
+    description: "Connect with fellow players and join our growing pickleball community",
+    icon: Users,
+    color: "bg-green-500"
+  },
+  {
+    title: "Tournaments",
+    description: "Participate in regular tournaments for all skill levels",
+    icon: Trophy,
+    color: "bg-purple-500"
+  },
+  {
+    title: "Premium Facilities",
+    description: "Experience world-class courts and amenities",
+    icon: Star,
+    color: "bg-orange-500"
+  }
+]
+
+const funFacts = [
+  {
+    title: "Origin Story",
+    fact: "Pickleball was invented in 1965 on Bainbridge Island, Washington, by three dads looking to entertain their bored children.",
+    icon: "🏓",
+    color: "bg-gradient-to-br from-blue-500 to-purple-600"
+  },
+  {
+    title: "Name Origin",
+    fact: "The game was named after the Pritchards' family dog, Pickles, who would chase after stray balls.",
+    icon: "🐕",
+    color: "bg-gradient-to-br from-green-500 to-teal-600"
+  },
+  {
+    title: "Fastest Growing Sport",
+    fact: "Pickleball is currently the fastest-growing sport in America, with a 39.3% growth rate between 2019 and 2021.",
+    icon: "📈",
+    color: "bg-gradient-to-br from-orange-500 to-red-600"
+  },
+  {
+    title: "Universal Appeal",
+    fact: "Players aged 6 to 85+ enjoy pickleball, making it one of the most accessible sports for all ages and skill levels.",
+    icon: "🌟",
+    color: "bg-gradient-to-br from-pink-500 to-rose-600"
+  }
+]
+
+const propertyImages = [
+  {
+    url: "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
+    title: "Premium Court 1",
+    description: "Professional-grade indoor court with climate control",
+    features: ["Climate Controlled", "Professional Lighting", "Premium Flooring"]
+  },
+  {
+    url: "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp",
+    title: "Outdoor Complex",
+    description: "Beautiful outdoor courts with perfect lighting",
+    features: ["UV Protection", "Night Lighting", "Tournament Ready"]
+  },
+  {
+    url: "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp",
+    title: "Tournament Arena",
+    description: "Championship court with spectator seating",
+    features: ["Spectator Seating", "Pro Equipment", "Event Space"]
+  }
+]
 
 const mapContainerStyle = {
   width: '100%',
@@ -26,261 +98,364 @@ const center = {
   lng: 125.1841202
 }
 
-const features = [
-  { 
-    title: "State-of-the-art Courts", 
-    description: "4 professional-grade courts with premium surfaces for optimal play.",
-    icon: <MapPin className="h-8 w-8" />,
-    image: "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp"
-  },
-  { 
-    title: "Extended Hours", 
-    description: "Fully lit courts for evening games and flexible playing times.",
-    icon: <Clock className="h-8 w-8" />,
-    image: "https://utfs.io/f/a31312a4-ac64-4212-9b8e-1ffb880a0e76-hep9t5.webp"
-  },
-  { 
-    title: "Regular Tournaments", 
-    description: "Exciting tournaments and leagues for competitive play.",
-    icon: <Trophy className="h-8 w-8" />,
-    image: "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp"
-  },
-  { 
-    title: "Lounge Area", 
-    description: "Comfortable space to relax and socialize between games.",
-    icon: <Coffee className="h-8 w-8" />,
-    image: "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp"
-  }
-]
-
-const carouselImages = [
-  {
-    src: "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
-    title: "Christmas Sale! Up to 15% off on new members!", 
-    color: "bg-gradient-to-r from-red-600 to-red-400"
-  },
-  {
-    src: "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp",
-    title: "New Year Special Membership",
-    color: "bg-gradient-to-r from-blue-600 to-blue-400"
-  },
-  {
-    src: "https://utfs.io/f/a31312a4-ac64-4212-9b8e-1ffb880a0e76-hep9t5.webp",
-    title: "Weekend Tournament",
-    color: "bg-gradient-to-r from-green-600 to-green-400"
-  },
-  {
-    src: "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp",
-    title: "Summer Camp Registration Open",
-    color: "bg-gradient-to-r from-orange-600 to-orange-400"
-  }
-]
-
-const testimonials = [
-  { name: "Ceazar R.", comment: "The courts are top-notch and the staff is incredibly friendly. Best pickle ball experience in GenSan!" },
-  { name: "Larry P.", comment: "I've improved my game so much thanks to the coaching here. Highly recommend for players of all levels." },
-  { name: "Kristian Q.", comment: "The extended hours are fantastic. I can come after work and still get a great game in." },
-  { name: "Maria S.", comment: "The community here is amazing. I've made so many new friends through pickle ball at this facility." },
-  { name: "David L.", comment: "State-of-the-art courts and equipment. It's a pleasure to play here every time." }
-]
-
-export default function EnhancedHomePage() {
-  const [activeFeature, setActiveFeature] = useState(0)
-  const router = useRouter()
+export default function HomePage() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [nextImageIndex, setNextImageIndex] = useState(1)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [propertyIndex, setPropertyIndex] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  
+  const images = [
+    "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
+    "https://utfs.io/f/d918ff1c-e346-4b8b-8046-aeb203019ba1-fh699f.webp",
+    "https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp"
+  ]
 
   const mapOptions = useMemo((): google.maps.MapOptions => ({
     disableDefaultUI: false,
-    clickableIcons: false,
-    scrollwheel: true,
-    mapTypeControlOptions: {
-      mapTypeIds: ['roadmap', 'satellite']
-    }
+    clickableIcons: true,
+    scrollwheel: true
   }), [])
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <HeaderFrontPage />
-      <main className="flex-grow">
-        <HeroCarousel images={carouselImages} />
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setIsTransitioning(true)
+      setNextImageIndex((currentImageIndex + 1) % images.length)
+      
+      setTimeout(() => {
+        setCurrentImageIndex(nextImageIndex)
+        setIsTransitioning(false)
+      }, 1000)
+    }, 3000)
 
-        <section className="relative w-full py-16 md:py-24 bg-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="grid gap-12 items-center lg:grid-cols-2">
-              <div className="flex flex-col space-y-6">
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">
-                  Elevate Your Game at General Santos Business Park Pickle Ball Court
-                </h1>
-                <p className="max-w-[700px] text-gray-600 md:text-xl">
-                  Experience the fastest-growing sport in our state-of-the-art facility. Join the pickle ball revolution today!
+    return () => clearInterval(intervalId)
+  }, [currentImageIndex, nextImageIndex, images.length])
+
+  useEffect(() => {
+    const autoPlayInterval = setInterval(() => {
+      if (isAutoPlaying) {
+        setPropertyIndex((prev) => (prev + 1) % propertyImages.length)
+      }
+    }, 5000)
+
+    return () => clearInterval(autoPlayInterval)
+  }, [isAutoPlaying])
+
+  const nextProperty = () => {
+    setIsAutoPlaying(false)
+    setPropertyIndex((prev) => (prev + 1) % propertyImages.length)
+  }
+
+  const prevProperty = () => {
+    setIsAutoPlaying(false)
+    setPropertyIndex((prev) => (prev - 1 + propertyImages.length) % propertyImages.length)
+  }
+
+  const router = useRouter()
+
+  return (
+    
+    <div className="min-h-screen bg-gray-50">
+      <MainNav />
+      
+      {/* Hero Section */}
+      <section className="relative h-[90vh] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="relative h-full">
+            <motion.div 
+              className="absolute inset-0"
+              animate={{ scale: 1.05 }}
+              transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
+            >
+              <Image
+                src={images[currentImageIndex]}
+                alt="Pickleball Court"
+                fill
+                className="object-cover transition-opacity duration-1000"
+                priority
+              />
+            </motion.div>
+            <motion.div 
+              className="absolute inset-0"
+              animate={{ scale: 1.05 }}
+              transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
+            >
+              <Image
+                src={images[nextImageIndex]}
+                alt="Pickleball Court"
+                fill
+                className={`object-cover transition-opacity duration-1000 ${isTransitioning ? 'opacity-100' : 'opacity-0'}`}
+                priority
+              />
+            </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
+          </div>
+        </div>
+        
+        <div className="relative h-full container mx-auto px-4 flex items-center">
+          <div className="max-w-2xl space-y-6">
+            <motion.h1 
+              className="text-4xl md:text-6xl font-bold text-white"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              Experience the Thrill of Pickleball
+            </motion.h1>
+            <motion.p 
+              className="text-xl text-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              Join the fastest-growing sport at General Santos Business Park&apos;s premier pickleball facility
+            </motion.p>
+            <motion.div 
+              className="flex flex-wrap gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Button 
+                size="lg" 
+                className="bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-all duration-300"
+                onClick={() => router.push('/auth/sign-up')}
+              >
+                Register now!
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 container mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Why Choose Us</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+            >
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <CardContent className="p-6">
+                  <div className={`w-12 h-12 ${feature.color} rounded-lg flex items-center justify-center mb-4 text-white transform group-hover:scale-110 transition-transform duration-300`}>
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Fun Facts Section */}
+      <section className="py-24 bg-gradient-to-b from-blue-50 to-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Fun Facts About Pickleball</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {funFacts.map((fact, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="overflow-hidden transform hover:-translate-y-1 transition-all duration-300 hover:shadow-xl">
+                  <div className={`${fact.color} p-1`}>
+                    <CardContent className="p-6 bg-white rounded-t-lg">
+                      <div className="flex items-start space-x-4">
+                        <div className="text-4xl">{fact.icon}</div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            {fact.title}
+                          </h3>
+                          <p className="text-gray-700 leading-relaxed">{fact.fact}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Property Advertisement Section */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Premium Facilities</h2>
+          <div className="relative max-w-4xl mx-auto">
+            <motion.div
+              key={propertyIndex}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+              className="relative h-[500px] rounded-xl overflow-hidden shadow-2xl"
+            >
+              <Image
+                src={propertyImages[propertyIndex].url}
+                alt={propertyImages[propertyIndex].title}
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <h3 className="text-3xl font-bold text-white mb-2">
+                  {propertyImages[propertyIndex].title}
+                </h3>
+                <p className="text-xl text-gray-200 mb-4">
+                  {propertyImages[propertyIndex].description}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button 
-                    size="lg" 
-                    className="bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300"
-                  >
-                    Book a Court
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-blue-600 text-blue-600 hover:bg-blue-50 transition-colors duration-300"
-                  >
-                    Learn More
-                  </Button>
+                <div className="flex flex-wrap gap-2">
+                  {propertyImages[propertyIndex].features.map((feature, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm"
+                    >
+                      {feature}
+                    </span>
+                  ))}
                 </div>
               </div>
-              <div className="w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
-                <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    center={center}
-                    zoom={19}
-                    options={mapOptions}
-                  >
-                    <Marker position={center} />
-                  </GoogleMap>
-                </LoadScript>
-              </div>
+            </motion.div>
+            
+            <div className="absolute left-4 right-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none">
+              <button
+                onClick={prevProperty}
+                className="pointer-events-auto transform hover:scale-110 transition-all duration-300 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg text-gray-800"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextProperty}
+                className="pointer-events-auto transform hover:scale-110 transition-all duration-300 bg-white/80 hover:bg-white p-3 rounded-full shadow-lg text-gray-800"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id="features" className="w-full py-24 bg-gradient-to-b from-white to-blue-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">World-Class Facilities</h2>
-            <div className="flex flex-col lg:flex-row gap-12 items-center">
-              <div className="w-full lg:w-1/2 space-y-6">
-                {features.map((feature, index) => (
-                  <FeatureCard
-                    key={index}
-                    feature={feature}
-                    isActive={activeFeature === index}
-                    onClick={() => setActiveFeature(index)}
-                  />
-                ))}
-              </div>
-              <div className="w-full lg:w-1/2">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="relative h-[500px] rounded-lg overflow-hidden shadow-xl"
-                >
-                  <Image
-                    src={features[activeFeature].image}
-                    alt={features[activeFeature].title}
-                    layout="fill"
-                    objectFit="cover"
-                    className="transition-opacity duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
-                  <div className="absolute bottom-0 left-0 p-8 text-white">
-                    <h3 className="text-3xl font-bold mb-3">{features[activeFeature].title}</h3>
-                    <p className="text-lg">{features[activeFeature].description}</p>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="about" className="w-full py-24 bg-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="grid gap-12 lg:grid-cols-2 items-center">
-              <div className="flex flex-col justify-center space-y-6">
-                <h2 className="text-4xl font-bold tracking-tighter text-gray-900">About Pickle Ball</h2>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Pickle Ball is a dynamic paddleball sport that combines elements of tennis, badminton, and table tennis. Played on a smaller court with a perforated plastic ball and solid paddles, it&apos;s a game that&apos;s easy to learn but challenging to master. Perfect for players of all ages and skill levels, Pickle Ball offers a unique blend of strategy, agility, and social interaction.
-                </p>
-                <Button className="w-fit bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300">
-                  Discover More
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </div>
-              <div className="flex items-center justify-center">
-                <Image
-                  src="https://utfs.io/f/b12eb9a2-0f34-4e7d-936b-036b47d2e49b-235u.webp"
-                  alt="Pickle Ball Court"
-                  width={600}
-                  height={400}
-                  className="rounded-lg object-cover shadow-lg"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="w-full py-24 bg-gray-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">What Our Players Say</h2>
-            <TestimonialCarousel testimonials={testimonials} />
-          </div>
-        </section>
-
-        <section id="membership" className="w-full py-24 bg-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">Annual Membership</h2>
-            <Card className="max-w-2xl mx-auto">
-              <CardHeader>
-                <CardTitle className="text-3xl text-center">Premium Membership</CardTitle>
-                <CardDescription className="text-4xl font-bold text-center text-blue-600">₱1,000 / year</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-4 text-lg">
-                  {[
-                    "Unlimited court access",
-                    "Priority booking",
-                    "Access to all facilities",
-                    "Participation in members-only events",
-                    "Free guest passes (2 per year)"
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center">
-                      <Check className="w-6 h-6 mr-4 text-green-600" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={() => router.push('/auth/sign-up')} className="w-full bg-blue-600 text-white hover:bg-blue-700 text-lg py-6 transition-colors duration-300">Become a Member</Button>
-              </CardFooter>
-            </Card>
-          </div>
-        </section>
-
-        <section id="contact" className="w-full py-24 bg-gray-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-4xl font-bold tracking-tighter text-center mb-12 text-gray-900">Get in Touch</h2>
-            <div className="grid gap-12 lg:grid-cols-2">
-              <ContactForm />
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl">Visit Us</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-4">
-                        <MapPin className="w-6 h-6 text-blue-600 mt-1" />
-                        <p className="text-lg">General Santos Business Park, National Highway, General Santos City, Philippines</p>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <Phone className="w-6 h-6 text-blue-600" />
-                        <p className="text-lg">+639 99 220 2427</p>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <Mail className="w-6 h-6 text-blue-600" />
-                        <p className="text-lg">pmd.associate@rdretailgroup.com.ph</p>
-                      </div>
+      {/* Membership Section */}
+      <section className="py-24 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Membership Plan</h2>
+          <div className="max-w-lg mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <Card className="relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300 hover:shadow-xl">
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 to-purple-500" />
+                <CardContent className="p-8">
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold mb-2">Premium Membership</h3>
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      ₱1,000
+                      <span className="text-lg text-gray-600">/month</span>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+                  </div>
+                  <ul className="space-y-3">
+                    {[
+                      "24/7 court access",
+                      "Priority booking system",
+                      "Free equipment rental",
+                      "Access to all facilities",
+                      "Tournament entry discounts",
+                      "Guest passes (2/month)",
+                      "Exclusive member events"
+                    ].map((feature, index) => (
+                      <motion.li
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        viewport={{ once: true }}
+                        className="flex items-center text-gray-600"
+                      >
+                        <Star className="w-5 h-5 text-blue-600 mr-2" />
+                        {feature}
+                      </motion.li>
+                    ))}
+                  </ul>
+                  <Button 
+                    className="w-full mt-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300" 
+                    size="lg"
+                  >
+                    Become a Member
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* Location Section */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Find Us</h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="max-w-5xl mx-auto rounded-xl overflow-hidden shadow-2xl"
+          >
+            <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
+              <GoogleMap
+                mapContainerStyle={mapContainerStyle}
+                center={center}
+                zoom={18}
+                options={mapOptions}
+              >
+                <Marker position={center} />
+              </GoogleMap>
+            </LoadScript>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Start Playing?</h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+              Join our community of pickleball enthusiasts and experience the best courts in General Santos City
+            </p>
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              asChild
+              className="transform hover:scale-105 transition-all duration-300"
+            >
+              <Link href="/auth/sign-up">
+                Get Started Today
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
 
       <Footer />
     </div>

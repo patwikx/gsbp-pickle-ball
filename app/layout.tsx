@@ -20,7 +20,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "GSBP Pickle Ball Court",
+  title: "GSBP Pickleball Court",
   description: "RD REALTY DEVELOPMENT CORPORATION",
 };
 

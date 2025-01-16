@@ -74,7 +74,7 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold">About Us</h3>
             <p className="text-gray-400">
-              General Santos Business Park Pickle Ball Court - your premier destination for pickle ball in GenSan. We offer state-of-the-art facilities and a vibrant community for players of all levels.
+              General Santos Business Park Pickleball Court - your premier destination for pickle ball in GenSan. We offer state-of-the-art facilities and a vibrant community for players of all levels.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((link) => (
@@ -149,7 +149,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2024 General Santos Business Park Pickle Ball Court. All rights reserved.
+              © 2024 General Santos Business Park Pickleball Court. All rights reserved.
             </p>
             <ul className="flex space-x-4 text-sm">
               {legalLinks.map((link) => (

@@ -38,13 +38,29 @@ export default function SignUp() {
           className="w-full max-w-[1000px] mt-4 sm:mt-8"
         >
           <Card className="overflow-hidden border-0 shadow-2xl mt-24">
+            {/* Mobile Payment Options */}
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden w-full"
+            >
+              <div className="p-6 pt-8 bg-gradient-to-b from-blue-50 to-transparent">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 text-center">
+                  Membership Options
+                </h3>
+                <PaymentOptions />
+              </div>
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-2" />
+            </motion.div>
+
             <div className="grid md:grid-cols-2">
-              {/* Left Side - Payment Options */}
+              {/* Desktop Payment Options */}
               <div className="hidden md:block">
                 <PaymentOptions />
               </div>
 
-              {/* Right Side - Form */}
+              {/* Form */}
               <div className="p-6 sm:p-8 md:p-12">
                 <div className="mx-auto max-w-md space-y-6 sm:space-y-8">
                   <div className="space-y-2">
@@ -52,7 +68,7 @@ export default function SignUp() {
                       Create Account 🎾
                     </h2>
                     <p className="text-sm sm:text-base text-gray-600">
-                      Join us and start your pickle ball journey today
+                      Join us and start your pickleball journey today
                     </p>
                   </div>
 

@@ -158,7 +158,7 @@ export default function CourtLayout() {
     <div className="container mx-auto p-2 space-y-6">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-primary to-primary/70 text-white p-6 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold">
-          GSBP Pickle Ball Court Booking
+          GSBP Pickleball Court Booking
         </h1>
         <div className="flex items-center gap-6 text-sm">
           <div className="flex items-center gap-2">
