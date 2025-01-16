@@ -328,17 +328,16 @@ export default function HomePage() {
                     <h3 className="text-2xl font-bold mb-2">Premium Membership</h3>
                     <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                       ₱1,000
-                      <span className="text-lg text-gray-600">/month</span>
+                      <span className="text-lg text-gray-600"> / year</span>
                     </div>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-3 text-center items-center">
                     {[
                       "24/7 court access",
                       "Priority booking system",
                       "Free equipment rental",
                       "Access to all facilities",
                       "Tournament entry discounts",
-                      "Guest passes (2/month)",
                       "Exclusive member events"
                     ].map((feature, index) => (
                       <motion.li
