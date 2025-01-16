@@ -5,8 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Menu, ChevronDown, Home, Calendar, LayoutGrid, LogOut, Bell, User,} from 'lucide-react'
-import { signOut, useSession } from 'next-auth/react'
+import { Menu, ChevronDown, Home, Calendar, LayoutGrid, LogOut, Bell, User, Settings, BookOpen, Users } from 'lucide-react'
+import { signOut } from 'next-auth/react'
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 import {
@@ -28,7 +30,6 @@ import { useCurrentUser } from '@/lib/auth'
 
 const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
   const pathname = usePathname()
-  const [isMonitoringOpen, setIsMonitoringOpen] = React.useState(false)
   const user = useCurrentUser();
   
   if (!user) return null
@@ -55,17 +56,15 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
         icon: User,
         active: pathname === "/dashboard/user-management",
       },
+      {
+        href: "/dashboard/monitoring",
+        label: 'Booking Monitoring',
+        description: "View and manage court bookings",
+        icon: LayoutGrid,
+        active: pathname === "/dashboard/monitoring",
+      },
     ] : []),
   ]
-
-  const monitoringRoutes = isAdmin ? [
-    {
-      href: "/dashboard/monitoring",
-      label: 'Bookings',
-      description: "View and manage court bookings",
-      active: pathname === "/dashboard/monitoring",
-    },
-  ] : []
 
   return (
     <nav
@@ -96,60 +95,6 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
           </Link>
         )
       })}
-      {isAdmin && (
-        <DropdownMenu open={isMonitoringOpen} onOpenChange={setIsMonitoringOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant={monitoringRoutes.some(route => route.active) ? "secondary" : "ghost"} 
-              className={cn(
-                "flex items-center px-4 py-2 text-sm font-medium transition-all",
-                "hover:bg-accent/50 hover:shadow-sm",
-                monitoringRoutes.some(route => route.active) 
-                  ? 'bg-accent/60 text-accent-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-accent-foreground'
-              )}
-            >
-              <LayoutGrid className="w-4 h-4 mr-2" />
-              Monitoring
-              <motion.div
-                animate={{ rotate: isMonitoringOpen ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-                className="ml-2 inline-block"
-              >
-                <ChevronDown className="h-4 w-4" />
-              </motion.div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end" 
-            className="w-[220px] p-2"
-            sideOffset={8}
-          >
-            {monitoringRoutes.map((route) => (
-              <DropdownMenuItem key={route.href} asChild>
-                <Link href={route.href} className="w-full">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={cn(
-                      'flex flex-col w-full rounded-md p-2 transition-all',
-                      'hover:bg-accent/50',
-                      route.active 
-                        ? 'bg-accent/60 text-accent-foreground' 
-                        : 'text-muted-foreground hover:text-accent-foreground'
-                    )}
-                  >
-                    <span className="font-medium">{route.label}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {route.description}
-                    </span>
-                  </motion.div>
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
     </nav>
   )
 }
@@ -161,12 +106,12 @@ function UserNav() {
   if (!user) return null
 
   const initials = user.name
-  ? user.name.split(' ').map(n => n[0]).join('').toUpperCase()
-  : '??'
+    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    : '??'
   
   return (
     <DropdownMenu>
-<DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
           className="relative h-10 flex items-center space-x-2 rounded-lg hover:bg-accent"
@@ -221,70 +166,154 @@ function UserNav() {
 }
 
 function MobileNav() {
-  const { data: session } = useSession()
-  const isAdmin = session?.user?.roles?.includes('Admin')
+  // const { data: session } = useSession()
+  const user = useCurrentUser()
   const pathname = usePathname()
+  // const router = useRouter()
   
+  if (!user) return null
+  
+  const isAdmin = user?.roles?.includes('Administrator')
+
+  const navigationItems = [
+    {
+      title: 'Main Menu',
+      items: [
+        {
+          href: "/dashboard",
+          label: 'Home',
+          icon: Home,
+          description: "Overview and quick actions"
+        },
+        {
+          href: "/dashboard/book-schedule",
+          label: 'Book a Court',
+          icon: BookOpen,
+          description: "Schedule your court time"
+        },
+      ]
+    },
+    ...(isAdmin ? [{
+      title: 'Administration',
+      items: [
+        {
+          href: "/dashboard/monitoring",
+          label: 'Booking Monitoring',
+          icon: LayoutGrid,
+          description: "View and manage court bookings"
+        },
+        {
+          href: "/dashboard/user-management",
+          label: 'User Management',
+          icon: Users,
+          description: "Manage user accounts and permissions"
+        },
+      ]
+    }] : []),
+    {
+      title: 'Account',
+      items: [
+        {
+          href: "/dashboard/my-account",
+          label: 'My Profile',
+          icon: User,
+          description: "View and edit your profile"
+        },
+        {
+          href: "/dashboard/settings",
+          label: 'Settings',
+          icon: Settings,
+          description: "Manage your preferences"
+        },
+      ]
+    }
+  ]
+
   return (
-    <div className="flex flex-col space-y-6 p-4">
-      <div className="space-y-4">
-        <div className="flex flex-col space-y-3">
-          <Link
-            href="/dashboard"
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/dashboard" && "text-primary"
-            )}
-          >
-            <Home className="mr-2 h-4 w-4 inline-block" />
-            Home
-          </Link>
-          <Link
-            href="/dashboard/book-schedule"
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-primary",
-              pathname === "/dashboard/book-schedule" && "text-primary"
-            )}
-          >
-            <Calendar className="mr-2 h-4 w-4 inline-block" />
-            Book a Court
-          </Link>
-          {isAdmin && (
-            <>
-              <Link
-                href="/dashboard/monitoring"
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === "/dashboard/monitoring" && "text-primary"
-                )}
-              >
-                <LayoutGrid className="mr-2 h-4 w-4 inline-block" />
-                Monitoring
-              </Link>
-              <Link
-                href="/dashboard/user-management"
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === "/dashboard/user-management" && "text-primary"
-                )}
-              >
-                <User className="mr-2 h-4 w-4 inline-block" />
-                User Management
-              </Link>
-            </>
-          )}
+    <div className="flex h-full flex-col">
+      <SheetHeader className="px-4 pt-6 pb-4 border-b">
+        <div className="flex items-center space-x-3">
+          <Image src="/rdrdc.webp" alt="Logo" width={32} height={32} className="rounded-lg" />
+          <div>
+            <SheetTitle className="text-lg">GSBP Pickleball Court</SheetTitle>
+            <p className="text-sm text-muted-foreground">Booking Management System</p>
+          </div>
+        </div>
+      </SheetHeader>
+      
+      <div className="flex-1 overflow-auto">
+        <div className="space-y-6 py-4">
+          {navigationItems.map((section, i) => (
+            <div key={i} className="px-4 space-y-3">
+              <h2 className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">
+                {section.title}
+              </h2>
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href
+                  
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                        isActive ? "bg-accent/50 text-accent-foreground" : "text-muted-foreground",
+                        "transition-all duration-200 ease-in-out"
+                      )}
+                    >
+                      <Icon className={cn(
+                        "mr-3 h-5 w-5",
+                        isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                      )} />
+                      <div className="flex flex-col">
+                        <span>{item.label}</span>
+                        <span className="text-xs text-muted-foreground font-normal">
+                          {item.description}
+                        </span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-      {session?.user && (
+      
+      <div className="border-t px-4 py-4">
+        <div className="flex items-center gap-3 mb-4 px-2">
+          <Avatar className="h-9 w-9">
+            {user.image ? (
+              <Image
+                src={user.image}
+                alt={user.name || 'User avatar'}
+                width={36}
+                height={36}
+              />
+            ) : (
+              <AvatarFallback>
+                {user.name
+                  ? user.name.split(' ').map(n => n[0]).join('').toUpperCase()
+                  : '??'}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{user.name}</span>
+            <span className="text-xs text-muted-foreground">{user.email}</span>
+          </div>
+        </div>
         <Button 
-          variant="ghost" 
-          className="justify-start px-2 hover:text-destructive w-full"
+          variant="destructive" 
+          className="w-full justify-start"
           onClick={() => signOut()}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Log out
+          Sign Out
         </Button>
-      )}
+      </div>
     </div>
   )
 }

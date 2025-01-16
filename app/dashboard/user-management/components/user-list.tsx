@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Search, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, ExternalLink, Download } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,12 +24,15 @@ import { changeUserPassword, deleteUser, updateUser } from './user-management'
 import { RegisterForm } from '@/components/auth/register-form'
 import { UserDialogs } from './users-dialog'
 import { UserActions } from './user-actions'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import * as XLSX from 'xlsx'
 
 export const revalidate = 0
 
 export function UserList({ initialUsers, totalUsers }: UserListProps) {
   const [users, setUsers] = useState(initialUsers)
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
@@ -41,22 +44,71 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
   })
   const { toast } = useToast()
 
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.id.toLowerCase().includes(searchTerm.toLowerCase())
 
+    if (statusFilter === 'all') return matchesSearch
+    if (statusFilter === 'active') return matchesSearch && user.emailVerified
+    if (statusFilter === 'inactive') return matchesSearch && !user.emailVerified
+    return matchesSearch
+  })
 
-  const paginatedUsers = users.slice(
+  const paginatedUsers = filteredUsers.slice(
     pagination.pageIndex * pagination.pageSize,
     (pagination.pageIndex + 1) * pagination.pageSize
   )
-  const totalPages = Math.ceil(users.length / pagination.pageSize)
+  const totalPages = Math.ceil(filteredUsers.length / pagination.pageSize)
 
   const handleSearch = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
     setPagination(prev => ({ ...prev, pageIndex: 0 }))
   }, [])
 
+  const handleStatusFilter = useCallback((value: string) => {
+    setStatusFilter(value as 'all' | 'active' | 'inactive')
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
+  }, [])
+
   const handlePageChange = useCallback((newPage: number) => {
     setPagination(prev => ({ ...prev, pageIndex: newPage }))
   }, [])
+
+  const handleExportToExcel = useCallback(() => {
+    try {
+      const exportData = filteredUsers.map(user => ({
+        'Member ID': user.id,
+        'Name': user.name || 'N/A',
+        'Email': user.email || 'N/A',
+        'Contact No.': user.contactNo || 'N/A',
+        'Address': user.address || 'N/A',
+        'Role': user.roles || 'User',
+        'Registration Date': user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A',
+        'Renewal Date': user.renewalDate ? new Date(user.renewalDate).toLocaleDateString() : 'N/A',
+        'Status': user.emailVerified ? 'Active' : 'Inactive'
+      }))
+
+      const ws = XLSX.utils.json_to_sheet(exportData)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Users')
+      
+      // Generate file name with current date
+      const fileName = `users_export_${new Date().toISOString().split('T')[0]}.xlsx`
+      XLSX.writeFile(wb, fileName)
+
+      toast({
+        title: "Success",
+        description: "Users data has been exported successfully.",
+      })
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to export users data",
+        variant: "destructive",
+      })
+    }
+  }, [filteredUsers, toast])
 
   const handleChangePassword = useCallback(async (password: string) => {
     if (!selectedUser) return
@@ -134,6 +186,21 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
     }
   }, [toast])
 
+  // Get the filter description for the badge
+  const getFilterDescription = () => {
+    if (statusFilter === 'all' && !searchTerm) {
+      return 'Total Users'
+    }
+    
+    const statusText = statusFilter === 'all' 
+      ? 'Users'
+      : statusFilter === 'active'
+        ? 'Active Users'
+        : 'Inactive Users'
+        
+    return `Filtered ${statusText}`
+  }
+
   return (
     <Card className="w-full shadow-lg">
       <CardHeader className="bg-primary/5">
@@ -145,20 +212,48 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
       <CardContent className="p-6">
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <div className="relative w-64">
-              <Input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={handleSearch}
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+            <div className="flex items-center gap-4">
+              <div className="relative w-64">
+                <Input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="pl-10"
+                />
+                <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+              </div>
+              <Select value={statusFilter} onValueChange={handleStatusFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Users</SelectItem>
+                  <SelectItem value="active">Active Users</SelectItem>
+                  <SelectItem value="inactive">Inactive Users</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-xs">
-                Total Users: {totalUsers}
-              </Badge>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportToExcel}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export to Excel
+              </Button>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  {getFilterDescription()}: {filteredUsers.length}
+                </Badge>
+                {(statusFilter !== 'all' || searchTerm) && (
+                  <Badge variant="secondary" className="text-xs">
+                    Total Users: {totalUsers}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
 
@@ -266,7 +361,7 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {(pagination.pageIndex * pagination.pageSize) + 1} to {Math.min((pagination.pageIndex + 1) * pagination.pageSize, users.length)} of {users.length} users
+              Showing {(pagination.pageIndex * pagination.pageSize) + 1} to {Math.min((pagination.pageIndex + 1) * pagination.pageSize, filteredUsers.length)} of {filteredUsers.length} users
             </p>
             <div className="flex items-center space-x-2">
               <Button
@@ -321,4 +416,3 @@ export function UserList({ initialUsers, totalUsers }: UserListProps) {
     </Card>
   )
 }
-
