@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { format, parse } from 'date-fns'
+import { format, parse, addDays } from 'date-fns'
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -27,6 +27,19 @@ export function DateCourtSelector({
   onCourtChange,
   isPastDate,
 }: DateCourtSelectorProps) {
+  const isDateDisabled = (date: Date) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = addDays(today, 1)
+    const formattedDate = format(date, 'yyyy-MM-dd')
+    
+    return (
+      isPastDate(formattedDate) || 
+      date.getTime() === today.getTime() || 
+      date.getTime() === tomorrow.getTime()
+    )
+  }
+
   return (
     <div className="flex flex-col space-y-4">
       <Popover>
@@ -48,7 +61,7 @@ export function DateCourtSelector({
             selected={parse(selectedDate, 'yyyy-MM-dd', new Date())}
             onSelect={(date) => date && onDateChange(format(date, 'yyyy-MM-dd'))}
             initialFocus
-            disabled={(date) => isPastDate(format(date, 'yyyy-MM-dd'))}
+            disabled={isDateDisabled}
           />
         </PopoverContent>
       </Popover>

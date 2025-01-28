@@ -5,6 +5,7 @@ import { Header } from '@/components/header'  // Import the Header component
 import SessionWrapper from '@/components/session-provider'
 import { ToastContainer } from '@/components/toast-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from '@/components/ui/sonner'
 
 export default async function RootLayout({
   children,
@@ -37,6 +38,7 @@ export default async function RootLayout({
         {children}
 
         </TooltipProvider>
+        <Toaster />
         <ToastContainer />
       </main>
     </div>

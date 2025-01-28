@@ -1,25 +1,44 @@
-import Link from 'next/link'
-import { HardHat, ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { prismadb } from "@/lib/db";
+import { Separator } from "@/components/ui/separator";
+import { ProfileTabs } from "./components/profile-tabs";
 
-export default function MyAccountPage() {
+export default async function ProfilePage() {
+  const session = await auth();
+  
+  if (!session?.user) {
+    redirect("/auth/login");
+  }
+
+  const user = await prismadb.user.findUnique({
+    where: { id: session.user.id },
+  });
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4">
-      <div className="text-center">
-        <HardHat className="mx-auto h-24 w-24 text-yellow-500 mb-8" />
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Under Construction</h1>
-        <p className="text-xl text-gray-600 mb-8">
-          We&apos;re working hard to bring you an amazing account management experience.
-          Please check back soon!
-        </p>
-        <Link href="/dashboard" passHref>
-          <Button variant="outline" className="inline-flex items-center">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
-        </Link>
-      </div>
+<div className="container max-w-6xl py-8 mx-auto">
+  <div className="space-y-6">
+    <div>
+      <h2 className="text-2xl font-bold tracking-tight">Profile Settings</h2>
+      <p className="text-muted-foreground">
+        Manage your account settings and preferences.
+      </p>
     </div>
-  )
+    <Separator />
+    <ProfileTabs 
+      initialData={{
+        name: user.name || "",
+        contactNo: user.contactNo || "",
+        address: user.address || "",
+        image: user.image || "",
+        email: user.email || "",
+      }}
+    />
+  </div>
+</div>
+  );
 }
-

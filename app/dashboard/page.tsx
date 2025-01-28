@@ -19,7 +19,7 @@ import { StatsCards } from '@/components/dashboard/stat-cards'
 import { BookingCard } from '@/components/dashboard/booking-card'
 import { BookingDetails } from '@/components/dashboard/booking-details'
 import { CancelDialog } from '@/components/dashboard/cancel-dialog'
-
+import { SystemUpdatesDialog } from '@/components/system-updates-dialog'
 
 const BOOKINGS_PER_PAGE = 5
 
@@ -45,6 +45,7 @@ export default function UserBookingsNew() {
   const [searchTerm, setSearchTerm] = React.useState('')
   const [filterCourt, setFilterCourt] = React.useState<number | 'all'>('all')
   const [showRulesModal, setShowRulesModal] = React.useState(true)
+  const [showUpdatesDialog, setShowUpdatesDialog] = React.useState(true)
 
   const { upcoming, past } = React.useMemo(
     () => filterAndSortBookings(bookings, searchTerm, filterCourt),
@@ -96,7 +97,6 @@ export default function UserBookingsNew() {
     (currentPage - 1) * BOOKINGS_PER_PAGE,
     currentPage * BOOKINGS_PER_PAGE
   )
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -228,6 +228,11 @@ export default function UserBookingsNew() {
           </CardContent>
         </Card>
       </main>
+
+      <SystemUpdatesDialog
+        isOpen={showUpdatesDialog}
+        onClose={() => setShowUpdatesDialog(false)}
+      />
 
       <BookingDetails
         booking={selectedBooking}
