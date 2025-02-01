@@ -61,3 +61,12 @@ export const filterAndSortBookings = (
 
   return { upcoming, past }
 }
+
+
+export function formatDate(dateString: string) {
+  return format(new Date(dateString), "PPP");
+}
+
+export function formatTime(timeString: string) {
+  return timeString;
+}

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Menu, ChevronDown, Home, Calendar, LayoutGrid, LogOut, Bell, User, Settings, BookOpen, Users } from 'lucide-react'
+import { Menu, Home, Calendar, LayoutGrid, LogOut, Bell, User, Settings, BookOpen, Users, ChevronsUpDown, QrCode, Mails } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 import { cn } from "@/lib/utils"
@@ -57,18 +57,32 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
         active: pathname === "/dashboard/user-management",
       },
       {
-        href: "/dashboard/monitoring",
+        href: "/dashboard/booking-monitoring",
         label: 'Booking Monitoring',
         description: "View and manage court bookings",
         icon: LayoutGrid,
-        active: pathname === "/dashboard/monitoring",
+        active: pathname === "/dashboard/booking-monitoring",
+      },
+      {
+        href: "/dashboard/scan-qr",
+        label: 'Scan QR',
+        description: "Scan QR",
+        icon: QrCode,
+        active: pathname === "/dashboard/scan-qr",
+      },
+      {
+        href: "/dashboard/email-blast",
+        label: 'Marketing',
+        description: "Send announcement and updates",
+        icon: Mails,
+        active: pathname === "/dashboard/email-blast",
       },
     ] : []),
   ]
 
   return (
     <nav
-      className={cn("flex items-center space-x-4", className)}
+      className={cn("flex items-center space-x-2", className)}
       {...props}
     >
       {routes.map((route) => {
@@ -82,10 +96,10 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={cn(
-                'flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all',
+                'flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-all',
                 'hover:bg-accent/50 hover:shadow-sm',
                 route.active 
-                  ? 'bg-accent/60 text-accent-foreground shadow-sm' 
+                  ? 'bg-primary text-primary-foreground shadow-sm' 
                   : 'text-muted-foreground hover:text-accent-foreground'
               )}
             >
@@ -102,6 +116,7 @@ const MainNav = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => 
 function UserNav() {
   const user = useCurrentUser();
   const router = useRouter();
+  const [hasNotifications] = React.useState(true);
   
   if (!user) return null
 
@@ -110,66 +125,86 @@ function UserNav() {
     : '??'
   
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          className="relative h-10 flex items-center space-x-2 rounded-lg hover:bg-accent"
-        >
-          <Avatar className="h-8 w-8">
-            {user.image ? (
-              <Image
-                src={user.image}
-                alt={user.name || 'User avatar'}
-                width={32}
-                height={32}
-              />
-            ) : (
-              <AvatarFallback>{initials}</AvatarFallback>
-            )}
-          </Avatar>
-          <div className="flex flex-col items-start">
-            <span className="text-sm font-medium">{user.name}</span>
-            <span className="text-xs text-muted-foreground">{user.email}</span>
+    <div className="flex items-center space-x-4">
+   
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative"
+        onClick={() => router.push('#')}
+      >
+        <Bell className="h-5 w-5 text-muted-foreground" />
+        {hasNotifications && (
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+        )}
+      </Button>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="outline" 
+            className="relative h-12 flex items-center space-x-2 rounded-lg hover:bg-accent px-3"
+          >
+            <Avatar className="h-8 w-8">
+              {user.image ? (
+                <Image
+                  src={user.image}
+                  alt={user.name || 'User avatar'}
+                  width={32}
+                  height={32}
+                />
+              ) : (
+                <AvatarFallback>{initials}</AvatarFallback>
+              )}
+            </Avatar>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-medium leading-none mb-1">{user.name}</span>
+            </div>
+            <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <div className="flex items-center justify-start gap-2 p-2">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            </div>
           </div>
-          <ChevronDown className="h-4 w-4 ml-2" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <div className="flex items-center justify-start gap-2 p-2 md:hidden">
-          <span className="text-sm font-medium">{user.name}</span>
-          <span className="text-xs text-muted-foreground">{user.email}</span>
-        </div>
-        <DropdownMenuSeparator className="md:hidden" />
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => router.push("/dashboard/my-account")}>
-            <User className="mr-2 h-4 w-4" />
-            <span>Account</span>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => router.push("/dashboard/my-account")}>
+              <User className="mr-2 h-4 w-4" />
+              <span>My Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/dashboard/notifications")}>
+              <Bell className="mr-2 h-4 w-4" />
+              <span>Notifications</span>
+              {hasNotifications && (
+                <span className="ml-auto flex h-2 w-2 rounded-full bg-primary" />
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            className="text-destructive focus:text-destructive cursor-pointer"
+            onClick={() => signOut()}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notifications</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          className="text-destructive focus:text-destructive cursor-pointer"
-          onClick={() => signOut()}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
 function MobileNav() {
-  // const { data: session } = useSession()
   const user = useCurrentUser()
   const pathname = usePathname()
-  // const router = useRouter()
   
   if (!user) return null
   
@@ -197,7 +232,7 @@ function MobileNav() {
       title: 'Administration',
       items: [
         {
-          href: "/dashboard/monitoring",
+          href: "/dashboard/booking-monitoring",
           label: 'Booking Monitoring',
           icon: LayoutGrid,
           description: "View and manage court bookings"
@@ -207,6 +242,20 @@ function MobileNav() {
           label: 'User Management',
           icon: Users,
           description: "Manage user accounts and permissions"
+        },
+        {
+          href: "/dashboard/scan-qr",
+          label: 'Scan QR',
+          description: "View and manage court bookings",
+          icon: QrCode,
+          active: pathname === "/dashboard/scan-qr",
+        },
+        {
+          href: "/dashboard/email-blast",
+          label: 'Marketing',
+          description: "Send announcement and updates",
+          icon: Mails,
+          active: pathname === "/dashboard/email-blast",
         },
       ]
     }] : []),
@@ -319,18 +368,39 @@ function MobileNav() {
 }
 
 export function Header() {
+  const [isScrolled, setIsScrolled] = React.useState(false)
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <div className="hidden md:flex md:items-center md:space-x-8">
+    <header className={cn(
+      "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+      isScrolled && "shadow-sm"
+    )}>
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="hidden md:flex md:items-center md:space-x-6">
           <Link href="/dashboard" className="flex items-center space-x-3">
-            <Image src="/rdrdc.webp" alt="Logo" width={32} height={32} />
+            <div className="relative h-8 w-8">
+              <Image 
+                src="/rdrdc.webp" 
+                alt="Logo" 
+                fill
+                className="object-contain"
+              />
+            </div>
             <span className="hidden font-bold sm:inline-block">
               GSBP Pickleball Court
             </span>
           </Link>
           <MainNav />
         </div>
+
         <div className="flex items-center space-x-4">
           <Sheet>
             <SheetTrigger asChild>
@@ -357,4 +427,3 @@ export function Header() {
     </header>
   )
 }
-

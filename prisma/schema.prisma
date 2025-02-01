@@ -68,6 +68,7 @@ model User {
   proofPayment  String?
   memberships   GroupMembership[]
   qrScans       QRScan[] // Relation to QR scans
+  emailLog      EmailLog[]
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt
   renewalDate   DateTime?
@@ -154,4 +155,17 @@ model QRScan {
   scannedAt DateTime @default(now())
   location  String? // Optional: track where the scan happened
   device    String? // Optional: track which device scanned the QR
+}
+
+model EmailLog {
+  id             String   @id @default(cuid())
+  subject        String
+  template       String
+  content        String
+  recipientCount Int
+  sentBy         String
+  sentAt         DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [sentBy], references: [id], onDelete: Cascade)
 }
