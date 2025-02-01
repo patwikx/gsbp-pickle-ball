@@ -5,18 +5,20 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { logQRScan } from "@/actions/qr-scan";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 export function QrScanner() {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     // Request camera permission when component mounts
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then(() => {
@@ -57,6 +59,7 @@ export function QrScanner() {
       setScanner(qrScanner);
       setIsScanning(true);
       setScanResult(null);
+      setShowSuccess(false);
     } catch (error) {
       console.error("Camera access error:", error);
       setCameraError("Please allow camera access to scan QR codes. If denied, please check your browser settings.");
@@ -66,7 +69,11 @@ export function QrScanner() {
 
   const stopScanning = () => {
     if (scanner) {
-      scanner.clear();
+      try {
+        scanner.clear();
+      } catch (error) {
+        console.error("Error clearing scanner:", error);
+      }
       setScanner(null);
     }
     setIsScanning(false);
@@ -85,16 +92,38 @@ export function QrScanner() {
 
       if (result.error) {
         if (result.isDuplicate) {
-          toast.error("This QR code has already been scanned today");
+          toast.dismiss(); // Clear any existing toasts
+          toast.error("This QR code has already been scanned today", {
+            duration: 3000,
+            id: 'qr-scan-result', // Unique ID to prevent duplicate toasts
+          });
         } else {
-          toast.error(result.error);
+          toast.dismiss();
+          toast.error(result.error, {
+            duration: 3000,
+            id: 'qr-scan-result',
+          });
         }
       } else {
-        toast.success("QR code scanned successfully");
+        setShowSuccess(true);
+        toast.dismiss();
+        toast.success("QR code scanned successfully", {
+          duration: 3000,
+          id: 'qr-scan-result',
+        });
+
+        // Hide success animation after 2 seconds
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 2000);
       }
     } catch (error) {
       console.error("Scan error:", error);
-      toast.error("Failed to process QR code");
+      toast.dismiss();
+      toast.error("Failed to process QR code", {
+        duration: 3000,
+        id: 'qr-scan-result',
+      });
     }
   };
 
@@ -107,6 +136,14 @@ export function QrScanner() {
 
   return (
     <div className="space-y-4">
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-full p-4 animate-bounce">
+            <CheckCircle2 className="h-16 w-16 text-green-500" />
+          </div>
+        </div>
+      )}
+
       {!isScanning && !scanResult && (
         <div className="flex flex-col items-center justify-center space-y-4 p-8 border-2 border-dashed rounded-lg">
           <p className="text-muted-foreground text-center">
