@@ -20,25 +20,28 @@ export default async function ProfilePage() {
   }
 
   return (
-<div className="container max-w-6xl py-8 mx-auto">
-  <div className="space-y-6">
-    <div>
-      <h2 className="text-2xl font-bold tracking-tight">Profile Settings</h2>
-      <p className="text-muted-foreground">
-        Manage your account settings and preferences.
-      </p>
+    <div className="container max-w-6xl py-8 mx-auto">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Profile Settings</h2>
+          <p className="text-muted-foreground">
+            Manage your account settings and preferences.
+          </p>
+        </div>
+        <Separator />
+        {/* Pass both initialData and user */}
+        <ProfileTabs 
+          initialData={{
+            name: user.name || "",
+            contactNo: user.contactNo || "",
+            address: user.address || "",
+            image: user.image || "",
+            email: user.email || "",
+            qrCode: user.qrCode || "",
+          }}
+          user={user}
+        />
+      </div>
     </div>
-    <Separator />
-    <ProfileTabs 
-      initialData={{
-        name: user.name || "",
-        contactNo: user.contactNo || "",
-        address: user.address || "",
-        image: user.image || "",
-        email: user.email || "",
-      }}
-    />
-  </div>
-</div>
   );
 }

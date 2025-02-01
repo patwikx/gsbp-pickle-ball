@@ -58,6 +58,7 @@ model User {
   address       String?
   image         String?
   roles         String?
+  qrCode        String?                 @unique
   accounts      Account[]
   sessions      Session[]
   bookings      Booking[]               @relation("UserBookings")
@@ -66,6 +67,7 @@ model User {
   ownedGroups   Group[]                 @relation("GroupOwner")
   proofPayment  String?
   memberships   GroupMembership[]
+  qrScans       QRScan[] // Relation to QR scans
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt
   renewalDate   DateTime?
@@ -143,4 +145,13 @@ model Group {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   invitations GroupInvitation[] @relation("GroupInvitations")
+}
+
+model QRScan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  scannedAt DateTime @default(now())
+  location  String? // Optional: track where the scan happened
+  device    String? // Optional: track which device scanned the QR
 }

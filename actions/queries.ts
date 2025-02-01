@@ -12,6 +12,7 @@ import { getCurrentUser } from "@/hooks/use-current-user";
 import { revalidatePath } from "next/cache";
 import { sendRegistrationEmail } from "./send-registration-email";
 import { sendNewRegistrationNotification } from "./registration-email-notif";
+import { generateQRCode } from "@/lib/utils";
 
 
 
@@ -242,3 +243,31 @@ import { sendNewRegistrationNotification } from "./registration-email-notif";
     return { success: "User registered successfully!", registrationId: newUser.id };
   };
   
+
+export async function generateUserQR(userId: string) {
+  try {
+    // Check if user already has a QR code
+    const user = await prismadb.user.findUnique({
+      where: { id: userId },
+      select: { qrCode: true }
+    });
+
+    if (user?.qrCode) {
+      return { error: "QR code already exists" };
+    }
+
+    // Generate a unique QR code (you can customize this format)
+    const qrCode = generateQRCode(userId);
+
+    // Update user with new QR code
+    await prismadb.user.update({
+      where: { id: userId },
+      data: { qrCode }
+    });
+
+    return { success: true, qrCode };
+  } catch (error) {
+    console.error("Error generating QR code:", error);
+    return { error: "Failed to generate QR code" };
+  }
+}

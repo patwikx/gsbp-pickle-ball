@@ -19,9 +19,11 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Download, Loader2, QrCode } from "lucide-react";
 import { updateProfile } from "@/actions/profile";
+import QRCode from "react-qr-code";
+import { generateUserQR } from "@/actions/queries";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -37,13 +39,21 @@ interface ProfileFormProps {
     address: string;
     image: string;
     email: string;
+    qrCode?: string;
   };
 }
 
 export function ProfileForm({ initialData }: ProfileFormProps) {
   const { data: session, update: updateSession } = useSession();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+  const [currentQRCode, setCurrentQRCode] = useState(initialData.qrCode);
+  const qrRef = useRef<HTMLDivElement>(null);
   
+  useEffect(() => {
+    setCurrentQRCode(initialData.qrCode);
+  }, [initialData.qrCode]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
@@ -67,6 +77,61 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
     }
   }
 
+  async function handleGenerateQR() {
+    if (!session?.user?.id) return;
+
+    try {
+      setIsGeneratingQR(true);
+      const response = await generateUserQR(session.user.id);
+
+      if (response.error) {
+        toast.error(response.error);
+      } else {
+        setCurrentQRCode(response.qrCode);
+        toast.success("QR code generated successfully");
+        await updateSession({
+          ...session,
+          user: {
+            ...session.user,
+            qrCode: response.qrCode
+          }
+        });
+      }
+    } finally {
+      setIsGeneratingQR(false);
+    }
+  }
+
+  const downloadQRCode = () => {
+    if (!qrRef.current) return;
+    
+    const svg = qrRef.current.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      if (ctx) {
+        ctx.fillStyle = 'white';
+      }
+      ctx?.fillRect(0, 0, canvas.width, canvas.height);
+      ctx?.drawImage(img, 0, 0);
+      
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `qr-code-${session?.user?.name || 'user'}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+  };
+
   return (
     <>
       <CardHeader>
@@ -86,6 +151,57 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
             <p className="text-sm text-muted-foreground">{initialData.email}</p>
           </div>
         </div>
+
+        {/* QR Code Section */}
+        <div className="border rounded-lg p-4 space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">QR Code</h3>
+            <Button
+              onClick={handleGenerateQR}
+              disabled={isGeneratingQR || !!currentQRCode}
+              variant="outline"
+            >
+              {isGeneratingQR && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <QrCode className="mr-2 h-4 w-4" />
+              {currentQRCode ? "QR Code Generated" : "Generate QR Code"}
+            </Button>
+          </div>
+          
+          {currentQRCode && (
+            <div className="flex flex-col items-center space-y-2">
+              <div ref={qrRef}>
+                <QRCode 
+                  value={currentQRCode}
+                  size={200}
+                  level="H"
+                  style={{ 
+                    height: "auto", 
+                    maxWidth: "100%", 
+                    width: "100%",
+                    padding: "1rem",
+                    backgroundColor: "white",
+                    borderRadius: "0.5rem",
+                    border: "1px solid #e2e8f0"
+                  }}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">
+                  QR Code ID: {currentQRCode}
+                </p>
+                <Button
+                  onClick={downloadQRCode}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download QR
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField

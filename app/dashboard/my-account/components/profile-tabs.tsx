@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { ProfileForm } from "./profile-form";
 import { SecurityForm } from "./security-form";
 import { NotificationSettings } from "./notification-settings";
 
-
+// The ProfileTabsProps interface should now expect user as well.
 interface ProfileTabsProps {
   initialData: {
     name: string;
@@ -15,6 +15,13 @@ interface ProfileTabsProps {
     address: string;
     image: string;
     email: string;
+    qrCode: string;
+  };
+  user: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    qrCode: string | null;
   };
 }
 
