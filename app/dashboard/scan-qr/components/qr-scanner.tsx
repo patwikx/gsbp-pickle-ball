@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { logQRScan } from "@/actions/qr-scan";
@@ -15,6 +15,7 @@ export function QrScanner() {
   const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isDuplicateScan, setIsDuplicateScan] = useState(false);
 
   useEffect(() => {
     // Request camera permission when component mounts
@@ -32,27 +33,31 @@ export function QrScanner() {
 
     return () => {
       if (scanner) {
-        scanner.clear();
+        try {
+          scanner.clear();
+        } catch (error) {
+          console.error("Error clearing scanner:", error);
+        }
       }
     };
   }, [scanner]);
 
   const startScanning = async () => {
     try {
+      setIsDuplicateScan(false);
+      
+      // Create scanner with safe configuration
+      const config = {
+        fps: 10,
+        qrbox: 250,
+        aspectRatio: 1.0,
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      };
+
       const qrScanner = new Html5QrcodeScanner(
         "qr-reader",
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
-          showTorchButtonIfSupported: true,
-          showZoomSliderIfSupported: true,
-          defaultZoomValueIfSupported: 2,
-          videoConstraints: {
-            facingMode: { ideal: "environment" }
-          }
-        },
-        false
+        config,
+        /* verbose= */ false
       );
 
       qrScanner.render(onScanSuccess, onScanError);
@@ -81,6 +86,11 @@ export function QrScanner() {
 
   const onScanSuccess = async (decodedText: string) => {
     try {
+      // If it's already a duplicate scan, ignore further processing
+      if (isDuplicateScan) {
+        return;
+      }
+
       stopScanning();
       setScanResult(decodedText);
       
@@ -92,10 +102,11 @@ export function QrScanner() {
 
       if (result.error) {
         if (result.isDuplicate) {
-          toast.dismiss(); // Clear any existing toasts
+          setIsDuplicateScan(true);
+          toast.dismiss();
           toast.error("This QR code has already been scanned today", {
             duration: 3000,
-            id: 'qr-scan-result', // Unique ID to prevent duplicate toasts
+            id: 'qr-scan-result',
           });
         } else {
           toast.dismiss();
