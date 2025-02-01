@@ -329,7 +329,7 @@ export default function EmailBlastForm() {
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <Editor
-                      apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY}
+                      apiKey={process.env.TINYMCE_API_KEY}
                       init={{
                         height: 400,
                         menubar: true,
