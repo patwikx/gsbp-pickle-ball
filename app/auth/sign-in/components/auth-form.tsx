@@ -122,7 +122,7 @@ export const UserAuthForm = () => {
                         asChild
                         className="px-0 font-normal"
                       >
-                        <Link href="/auth/reset">
+                        <Link href="/auth/forgot-password">
                           Forgot password?
                         </Link>
                       </Button>
