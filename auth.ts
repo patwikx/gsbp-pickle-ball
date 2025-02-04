@@ -68,6 +68,10 @@ export const {
     }
   },
   adapter: PrismaAdapter(prismadb),
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt",
+    maxAge: 60 * 60, // 30 days (in seconds).  Adjust as needed.  This is the key setting!
+    updateAge: 24 * 60 * 60, 
+
+   },
   ...authConfig,
 });
