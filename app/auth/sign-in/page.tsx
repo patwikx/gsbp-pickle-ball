@@ -30,7 +30,7 @@ export default function SignIn() {
         >
           <Image
             src="https://utfs.io/f/pUvyWRtocgCVXkOFRZ4SQFwVzqytEldgvRNPo3K4W5XnAihe"
-            alt="General Santos Business Park Pickle Ball Court"
+            alt="General Santos Business Park Pickleball Court"
             width={1200}
             height={400}
             className="w-full h-auto max-h-[300px] object-contain px-4"
@@ -86,7 +86,7 @@ export default function SignIn() {
                       Welcome👋
                     </h2>
                     <p className="text-sm sm:text-base text-gray-600">
-                      Sign in to book your next pickle ball session
+                      Sign in to book your next pickleball session
                     </p>
                   </div>
 
