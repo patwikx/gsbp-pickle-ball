@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
@@ -34,6 +35,9 @@ export function GuidelinesModal({ isOpen, onClose }: GuidelinesModalProps) {
           <DialogTitle className="text-xl font-bold text-center">
             General Santos Business Park Pickleball Guidelines
           </DialogTitle>
+          <DialogDescription>
+           {/*  Rules & Regulations */}
+          </DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-[500px] pr-4">
           <div className="space-y-6">
