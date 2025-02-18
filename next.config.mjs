@@ -4,7 +4,7 @@ const nextConfig = {
         domains: [
             "res.cloudinary.com",
             "utfs.io",
-            "4b9moeer4y.ufs.sh"
+            "4b9moeer4y.ufs.sh",
         ]
     }
 };
