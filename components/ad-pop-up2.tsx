@@ -15,7 +15,7 @@ export function AdPopup2() {
       const timer = setTimeout(() => {
         setIsOpen(true)
         setHasBeenShown(true)
-      }, 2000)
+      }, 500)
 
       return () => clearTimeout(timer)
     }
