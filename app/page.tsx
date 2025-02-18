@@ -12,7 +12,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { MainNav } from '@/components/front-page-header'
 import { Footer } from '@/components/footer'
 import { useRouter } from 'next/navigation'
-import { AdPopup } from '@/components/ad-pop-up'
+import { AdPopup1 } from '@/components/ad-pop-up1'
+import { AdPopup2 } from '@/components/ad-pop-up2'
 
 const features = [
   {
@@ -140,7 +141,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <MainNav />
-      <AdPopup />
+      <AdPopup1 />
+      <AdPopup2 />
       
       {/* Hero Section */}
       <section className="relative h-[90vh] overflow-hidden">

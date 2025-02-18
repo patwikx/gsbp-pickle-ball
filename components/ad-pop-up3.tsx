@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-export function AdPopup() {
+export function AdPopup3() {
   const [isOpen, setIsOpen] = useState(false)
   const [hasBeenShown, setHasBeenShown] = useState(false)
 
@@ -40,14 +40,14 @@ export function AdPopup() {
               <X className="w-5 h-5 text-gray-600" />
             </button>
             <a 
-              href="https://www.facebook.com/rdhfsi/" 
+              href="https://www.facebook.com/RDRealtyGensan/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="block cursor-pointer transform hover:scale-[1.02] transition-transform duration-200"
             >
               <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
                 <Image
-                  src="https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVxTwFWYauWJcdCKQ0Z1E8Pn7sSew4vUgo6khM"
+                  src="https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVjN8KsSJ2aSpFg1cK04bxM5IZTu7s6YJGtEdr"
                   alt="Advertisement"
                   fill
                   className="object-cover"
