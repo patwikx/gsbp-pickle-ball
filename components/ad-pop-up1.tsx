@@ -1,11 +1,13 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import type React from "react"
 
-export function AdPopup1() {
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import { X } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+
+export function AdPopup() {
   const [isOpen, setIsOpen] = useState(false)
   const [hasBeenShown, setHasBeenShown] = useState(false)
 
@@ -21,6 +23,12 @@ export function AdPopup1() {
     }
   }, [hasBeenShown])
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    // Open in a new window/tab to prevent mobile refresh
+    window.open("https://www.facebook.com/RDRealtyGensan", "_blank", "noopener,noreferrer")
+  }
+
   if (!isOpen) return null
 
   return (
@@ -30,7 +38,7 @@ export function AdPopup1() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-8 right-8 z-50 max-w-md w-full"
+          className="fixed bottom-8 left-8 z-50 max-w-md w-full"
         >
           <div className="relative">
             <button
@@ -39,22 +47,20 @@ export function AdPopup1() {
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
-            <a 
-              href="https://www.facebook.com/rdhfsi/" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <div
+              onClick={handleClick}
               className="block cursor-pointer transform hover:scale-[1.02] transition-transform duration-200"
             >
               <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
                 <Image
-                  src="https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVxTwFWYauWJcdCKQ0Z1E8Pn7sSew4vUgo6khM"
+                  src="https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCV8qjFnTwbQWfZ8qR7tlALo4shKJmruxVyOwcp"
                   alt="Advertisement"
                   fill
                   className="object-cover"
                   priority
                 />
               </div>
-            </a>
+            </div>
           </div>
         </motion.div>
       )}

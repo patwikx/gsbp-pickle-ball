@@ -5,6 +5,7 @@ const nextConfig = {
             "res.cloudinary.com",
             "utfs.io",
             "4b9moeer4y.ufs.sh",
+            "www.facebook.com"
         ]
     }
 };

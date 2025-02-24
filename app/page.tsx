@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { MainNav } from '@/components/front-page-header'
 import { Footer } from '@/components/footer'
 import { useRouter } from 'next/navigation'
+import { AdPopup } from '@/components/ad-pop-up1'
 
 const features = [
   {
@@ -101,6 +102,7 @@ const center = {
 export default function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [propertyIndex, setPropertyIndex] = useState(0)
+
   
   const images = [
     "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVhVBTeBL6dURkCuz3sloM2OqFTWgGJyQ01485",
@@ -139,6 +141,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <MainNav />
+
+      <AdPopup />
       
       {/* Hero Section */}
       <section className="relative h-[90vh] overflow-hidden">
