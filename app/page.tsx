@@ -103,13 +103,13 @@ export default function HomePage() {
   const [propertyIndex, setPropertyIndex] = useState(0)
   
   const images = [
-    "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
-    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVrQ152PpuOasyUGgBmjXo3zxvSV4LElJHIM58",
-    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVSFS1kKPxQ8AsDOWnbNTajmwkgGJrKeCXdIfB",
     "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVhVBTeBL6dURkCuz3sloM2OqFTWgGJyQ01485",
     "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVXXifoU4SQFwVzqytEldgvRNPo3K4W5XnAihe",
     "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCV8yJWY3wbQWfZ8qR7tlALo4shKJmruxVyOwcp",
-    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVRXUpY6iBg1ydiaq5LNXQVuEso6hCczW2ejlw"
+    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVRXUpY6iBg1ydiaq5LNXQVuEso6hCczW2ejlw",
+    "https://utfs.io/f/79b3aedf-1d04-4a29-bb08-f21736a645f8-1w7cq.webp",
+    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVrQ152PpuOasyUGgBmjXo3zxvSV4LElJHIM58",
+    "https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCVSFS1kKPxQ8AsDOWnbNTajmwkgGJrKeCXdIfB"
   ]
 
   const mapOptions = useMemo((): google.maps.MapOptions => ({
