@@ -12,7 +12,6 @@ export function AdPopup() {
   const [hasBeenShown, setHasBeenShown] = useState(false)
 
   useEffect(() => {
-    // Show the popup after 2 seconds, but only once per session
     if (!hasBeenShown) {
       const timer = setTimeout(() => {
         setIsOpen(true)
@@ -25,7 +24,6 @@ export function AdPopup() {
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    // Open in a new window/tab to prevent mobile refresh
     window.open("https://www.facebook.com/RDRealtyGensan", "_blank", "noopener,noreferrer")
   }
 
@@ -38,20 +36,20 @@ export function AdPopup() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
-          className="fixed bottom-8 left-8 z-50 max-w-md w-full"
+          className="fixed bottom-4 left-4 right-4 z-50 md:max-w-md md:left-8 md:right-auto"
         >
-          <div className="relative">
+          <div className="relative bg-white rounded-lg shadow-2xl overflow-hidden">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute -top-2 -right-2 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors"
+              className="absolute top-2 right-2 z-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
             <div
               onClick={handleClick}
-              className="block cursor-pointer transform hover:scale-[1.02] transition-transform duration-200"
+              className="cursor-pointer transform hover:scale-[1.02] transition-transform duration-200"
             >
-              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
+              <div className="relative w-full aspect-[4/3]">
                 <Image
                   src="https://4b9moeer4y.ufs.sh/f/pUvyWRtocgCV8qjFnTwbQWfZ8qR7tlALo4shKJmruxVyOwcp"
                   alt="Advertisement"
@@ -67,3 +65,4 @@ export function AdPopup() {
     </AnimatePresence>
   )
 }
+
